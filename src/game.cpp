@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "game.h"
 #include "map/map.h"
+#include "map/block.h"
 #include "map/maprenderer.h"
 #include "map/mapgenerator.h"
 #include "util/vectormath.h"

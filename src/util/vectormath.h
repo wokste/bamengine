@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/System/Vector2.hpp>
 
 namespace VectorMath
 {
@@ -15,5 +16,10 @@ namespace VectorMath
 	template <typename T>
 	constexpr T normalize(const T& self){
 		return self / length(self);
+	}
+
+	template <typename R, typename T>
+	constexpr R convert(const sf::Vector2<T>& source){
+		return R(source.x, source.y);
 	}
 }

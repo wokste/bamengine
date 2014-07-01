@@ -1,10 +1,9 @@
 #pragma once
-
 #include "grid.h"
-#include "block.h"
 #include <cmath>
 
 class Block;
+class BlockList;
 
 class Map{
 	const BlockList& mList;
