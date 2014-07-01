@@ -4,10 +4,10 @@
 
 class Block{
 public:
-	std::string tag;
-	int frameStart;
-	int frameCount;
-	bool solid;
+	std::string mTag;
+	int mFrameStart;
+	int mFrameCount;
+	bool mSolid;
 
 	Block(){}
 };

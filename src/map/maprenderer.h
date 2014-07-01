@@ -7,11 +7,11 @@ class Block;
 namespace sf{ class Sprite;}
 
 class MapRenderer {
-	constexpr static int innerTileSize = 12;
-	constexpr static int border = 2;
-	constexpr static int outerTileSize = innerTileSize + 2 * border;
-	int framesPerRow;
-	sf::Texture tileSet;
+	constexpr static int mInnerTileSize = 12;
+	constexpr static int mBorder = 2;
+	constexpr static int mOuterTileSize = mInnerTileSize + 2 * mBorder;
+	int mFramesPerRow;
+	sf::Texture mTileSet;
 
 public:
 	MapRenderer();

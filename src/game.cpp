@@ -23,27 +23,27 @@ namespace VectorMath
 }
 
 class Game : public IGame{
-	std::unique_ptr<Map> map;
-	sf::Vector2f centerPos;
-	const BlockList blockList;
+	std::unique_ptr<Map> mMap;
+	sf::Vector2f mCenterPos;
+	const BlockList mBlockList;
 
 public:
-	Game() : blockList("data/blocks.csv"){
-		map = MapGenerator::generate(blockList, "plains", 1337);
+	Game() : mBlockList("data/blocks.csv"){
+		mMap = MapGenerator::generate(mBlockList, "plains", 1337);
 	}
 
 	void display(sf::RenderTarget& target, float interpolation) override{
 		sf::View v = target.getView();
-		v.setCenter(centerPos + interpolation * getCameraVelocity());
+		v.setCenter(mCenterPos + interpolation * getCameraVelocity());
 		target.setView(v);
 
 		// Render the map
-		MapRenderer ren;
-		ren.render(*map, target, 0);
+		MapRenderer mapRenderer;
+		mapRenderer.render(*mMap, target, 0);
 	}
 
 	void logic() override{
-		centerPos += getCameraVelocity();
+		mCenterPos += getCameraVelocity();
 	}
 
 private:

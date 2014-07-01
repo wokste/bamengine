@@ -7,20 +7,20 @@
 #include <SFML/OpenGL.hpp>
 
 MapRenderer::MapRenderer(){
-	tileSet.loadFromFile("data/tileset.png");
-	framesPerRow = (int)(tileSet.getSize().x / outerTileSize);
+	mTileSet.loadFromFile("data/tileset.png");
+	mFramesPerRow = (int)(mTileSet.getSize().x / mOuterTileSize);
 }
 
 void MapRenderer::render(const Map& map, sf::RenderTarget& renderTarget, int layer) {
 	const sf::Vector2f screenCenter = renderTarget.getView().getCenter();
 	const sf::Vector2f screenSize = renderTarget.getView().getSize();
 
-	int minX = std::max(0, (int)(screenCenter.x - screenSize.x / 2) / innerTileSize);
-	int maxX = std::min(map.grid.getWidth(), (int)(screenCenter.x + screenSize.x / 2) / innerTileSize + 1);
-	int minY = std::max(0, (int)(screenCenter.y - screenSize.y / 2) / innerTileSize);
-	int maxY = std::min(map.grid.getHeight(), (int)(screenCenter.y + screenSize.y / 2) / innerTileSize + 1);
+	int minX = std::max(0, (int)(screenCenter.x - screenSize.x / 2) / mInnerTileSize);
+	int maxX = std::min(map.getWidth(), (int)(screenCenter.x + screenSize.x / 2) / mInnerTileSize + 1);
+	int minY = std::max(0, (int)(screenCenter.y - screenSize.y / 2) / mInnerTileSize);
+	int maxY = std::min(map.getHeight(), (int)(screenCenter.y + screenSize.y / 2) / mInnerTileSize + 1);
 
-	sf::Sprite sprite(tileSet);
+	sf::Sprite sprite(mTileSet);
 
 	//glBegin(GL_QUADS);
 	for(int x = minX; x < maxX; x++){
@@ -43,26 +43,29 @@ void MapRenderer::render(const Map& map, sf::RenderTarget& renderTarget, int lay
 }
 
 void MapRenderer::updateSprite(sf::Sprite& sprite, int frame, float tileX, float tileY, bool borderLeft, bool borderTop, bool borderRight, bool borderBottom){
-	int x=tileX * innerTileSize;
-	int y=tileY * innerTileSize;
+	int x=tileX * mInnerTileSize;
+	int y=tileY * mInnerTileSize;
 
-	sf::IntRect rect((frame % framesPerRow) * outerTileSize + border, (frame / framesPerRow) * outerTileSize + border, innerTileSize, innerTileSize);
+	sf::IntRect rect{
+		(frame % mFramesPerRow) * mOuterTileSize + mBorder,
+		(frame / mFramesPerRow) * mOuterTileSize + mBorder, mInnerTileSize, mInnerTileSize
+	};
 
 	if (borderLeft){
-		rect.left -= border;
-		x -= border;
-		rect.width += border;
+		rect.left -= mBorder;
+		x -= mBorder;
+		rect.width += mBorder;
 	}
 	if (borderRight){
-		rect.width += border;
+		rect.width += mBorder;
 	}
 	if (borderTop){
-		rect.top -= border;
-		y -= border;
-		rect.height += border;
+		rect.top -= mBorder;
+		y -= mBorder;
+		rect.height += mBorder;
 	}
 	if (borderBottom){
-		rect.height += border;
+		rect.height += mBorder;
 	}
 
 	sprite.setTextureRect(rect);
@@ -74,6 +77,6 @@ int MapRenderer::chooseFrame(const Block* type, int x, int y) const{
 	seed ^= seed<<13;
 	  seed=(seed*(seed*60493+19990303)+1376312589)&0x7fffffff;
 
-	return type->frameStart + ((seed >> 24) % type->frameCount);
+	return type->mFrameStart + ((seed >> 24) % type->mFrameCount);
 }
 

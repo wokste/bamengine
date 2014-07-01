@@ -8,13 +8,13 @@ using namespace std;
 
 namespace MapGenerator{
 	struct Biome{
-		int m_soilHeight = 4;
-		int m_mountainHeight = 50;
-		int m_mountainWidth = 100;
-		int m_groundLevel = 80;
+		int mSoilHeight = 4;
+		int mMountainHeight = 50;
+		int mMountainWidth = 100;
+		int mGroundLevel = 80;
 
-		int m_soilBlock = 0;
-		int m_stoneBlock = 1;
+		int mSoilBlock = 0;
+		int mStoneBlock = 1;
 
 		void placeBasicTerrain(Map& map, int layer) const;
 	};
@@ -34,27 +34,27 @@ namespace MapGenerator{
 
 	// PRIVATE
 	int getHeight(const Map& map, int x){
-		for(int y = 0; y < map.grid.getHeight(); y++){
-			if (map.solid(x,y, 1))
+		for(int y = 0; y < map.getHeight(); y++){
+			if (map.solid(x, y, 1))
 				return y;
 		}
 		return -1;
 	}
 
 	void Biome::placeBasicTerrain(Map& map, int layer) const{
-		for(int x = 0; x < map.grid.getWidth(); x++){
+		for(int x = 0; x < map.getWidth(); x++){
 			noise::module::Perlin heightMap;
-			int groundLevel = (int) (heightMap.GetValue(x / (float)m_mountainWidth,0,0) * m_mountainHeight) + m_groundLevel;
-			int dirtHeight = (int) m_soilHeight;// (dirtHeightMap.noise2d(x, 0) * 4) + 4;
-			for(int y = 0; y < map.grid.getHeight() ; y++){
+			int groundLevel = (int) (heightMap.GetValue(x / (float)mMountainWidth,0,0) * mMountainHeight) + mGroundLevel;
+			int dirtHeight = (int) mSoilHeight;
+			for(int y = 0; y < map.getHeight(); y++){
 				int blockId = -1;
 
 				if (y > groundLevel + dirtHeight) {
 					// stone layer
-					blockId = m_stoneBlock;
+					blockId = mStoneBlock;
 				} else if (y > groundLevel) {
 					// dirt layer
-					blockId = m_soilBlock;
+					blockId = mSoilBlock;
 				}
 				map.idAt(x,y,layer) = blockId;
 			}

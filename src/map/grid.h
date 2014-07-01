@@ -14,14 +14,14 @@ inline void Assert(A assertion)
 template <typename T>
 class Grid {
 public:
-	constexpr static int numLayers = 3;
+	constexpr static int mNumLayers = 3;
 private:
-	constexpr static int chunkWidth = 64;
-	constexpr static int chunkHeight = 64;
+	constexpr static int mChunkWidth = 64;
+	constexpr static int mChunkHeight = 64;
 
 	/// A piece of the map for faster access.
 	struct Chunk {
-		T cells[chunkWidth*chunkHeight*numLayers];
+		T cells[mChunkWidth*mChunkHeight*mNumLayers];
 
 		Chunk(){
 			for(auto& cel : cells){
@@ -30,11 +30,11 @@ private:
 		}
 
 		T& at(int x, int y, int layer){
-			return cells[layer + numLayers * (y + chunkHeight * x)];
+			return cells[layer + mNumLayers * (y + mChunkHeight * x)];
 		}
 
 		const T& at(int x, int y, int layer) const{
-			return cells[layer + numLayers * (y + chunkHeight * x)];
+			return cells[layer + mNumLayers * (y + mChunkHeight * x)];
 		}
 	};
 
@@ -47,30 +47,30 @@ public:
 	int getHeight() const {return height;}
 
 	Grid(int width, int height){
-		Assert<Precondition>(width > 0 && height > 0 && width % chunkWidth == 0 && height % chunkHeight == 0);
+		Assert<Precondition>(width > 0 && height > 0 && width % mChunkWidth == 0 && height % mChunkHeight == 0);
 		this->width = width;
 		this->height = height;
 
-		for(int c = 0; c < (width / chunkWidth) * (height / chunkHeight); c++)
+		for(int c = 0; c < (width / mChunkWidth) * (height / mChunkHeight); c++)
 			chunks.push_back(Chunk());
 	}
 
 	constexpr bool inArea(int x, int y, int layer){
-		return x >= 0 && y >= 0 && layer >= 0 && x < width && y < height && layer < numLayers;
+		return x >= 0 && y >= 0 && layer >= 0 && x < width && y < height && layer < mNumLayers;
 	}
 
 	T& at(int x, int y, int layer){
 		Assert<Precondition>(inArea(x,y,layer));
 
-		int chunkId = x / chunkWidth + (width / chunkWidth) * (y / chunkHeight);
-		return chunks[chunkId].at(x % chunkWidth, y % chunkHeight, layer);
+		int chunkId = x / mChunkWidth + (width / mChunkWidth) * (y / mChunkHeight);
+		return chunks[chunkId].at(x % mChunkWidth, y % mChunkHeight, layer);
 	}
 
 	const T& at(int x, int y, int layer) const{
 		Assert<Precondition>(inArea(x,y,layer));
 
-		int chunkId = (x / chunkWidth) + (width / chunkWidth) * (y / chunkHeight);
+		int chunkId = (x / mChunkWidth) + (width / mChunkWidth) * (y / mChunkHeight);
 		Assert<ComputationError>(chunkId >= 0 && chunkId < chunks.size());
-		return chunks[chunkId].at(x % chunkWidth, y % chunkHeight, layer);
+		return chunks[chunkId].at(x % mChunkWidth, y % mChunkHeight, layer);
 	}
 };

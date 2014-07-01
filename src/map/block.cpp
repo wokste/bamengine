@@ -6,8 +6,8 @@ BlockList::BlockList(const std::string& fileName){
 
 	Block block;
 
-	while(in.read_row(block.tag, block.frameStart, block.frameCount)){
-		block.solid = true;
+	while(in.read_row(block.mTag, block.mFrameStart, block.mFrameCount)){
+		block.mSolid = true;
 		blocks.push_back(block);
 	}
 }
