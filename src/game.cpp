@@ -25,10 +25,11 @@ namespace VectorMath
 class Game : public IGame{
 	std::unique_ptr<Map> map;
 	sf::Vector2f centerPos;
+	const BlockList blockList;
 
 public:
-	Game(){
-		map = MapGenerator::generate("plains", 1337);
+	Game() : blockList("data/blocks.csv"){
+		map = MapGenerator::generate(blockList, "plains", 1337);
 	}
 
 	void display(sf::RenderTarget& target, float interpolation) override{

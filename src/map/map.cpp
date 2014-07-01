@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-Map::Map(int w, int h) : grid(w,h){
+Map::Map(const BlockList& list,int w, int h) : list(list), grid(w,h){
 }
 
 bool Map::solid(int x, int y, int layer) const{
@@ -12,7 +12,7 @@ bool Map::solid(int x, int y, int layer) const{
 	int id = grid.at(x,y,layer);
 	if (id < 0)
 		return false;
-	return blockTypes[id]->solid;
+	return list[id].solid;
 }
 
 const Block* Map::getBlock(int x, int y, int layer) const{
@@ -22,10 +22,14 @@ const Block* Map::getBlock(int x, int y, int layer) const{
 	int id = grid.at(x,y,layer);
 	if (id < 0)
 		return nullptr;
-	return blockTypes[id];
+	return &(list[id]);
 }
 
-bool Map::placeBlock(int x, int y, int layer, const Block* block){
+int& Map::idAt(int x, int y, int layer){
+	return grid.at(x,y,layer);
+}
+
+bool Map::placeBlock(int x, int y, int layer, int block){
 	if (!grid.inArea(x,y,layer))
 		return false;
 
@@ -36,20 +40,9 @@ bool Map::placeBlock(int x, int y, int layer, const Block* block){
 	return false;
 }
 
-bool Map::setBlock(int x, int y, int layer, const Block* block){
+bool Map::setBlock(int x, int y, int layer, int blockId){
 	if (!grid.inArea(x,y,layer))
 		return false;
-
-	if (block == nullptr)
-		return false;
-
-	auto it = std::find(blockTypes.begin(), blockTypes.end(), block);
-	int blockId = std::distance(blockTypes.begin(), it);
-
-	if (it == blockTypes.end()){
-		// block not in vector
-		blockTypes.push_back(block);
-	}
 
 	grid.at(x,y,layer) = blockId;
 	return true;

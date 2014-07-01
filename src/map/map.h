@@ -5,16 +5,16 @@
 #include <cmath>
 
 class Block;
-typedef Block* BlockRef;
 
 class Map{
-	std::vector<const Block*> blockTypes;
+	const BlockList& list;
 
 public:
 	Grid<int> grid;
-	Map(int w, int h);
+	Map(const BlockList& list, int w, int h);
 	bool solid(int x, int y, int layer) const;
 	const Block* getBlock(int x, int y, int layer) const;
-	bool placeBlock(int x, int y, int layer, const Block* block);
-	bool setBlock(int x, int y, int layer, const Block* block);
+	int& idAt(int x, int y, int layer);
+	bool placeBlock(int x, int y, int layer, const int blockId);
+	bool setBlock(int x, int y, int layer, const int blockId);
 };

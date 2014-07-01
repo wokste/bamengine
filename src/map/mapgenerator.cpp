@@ -13,8 +13,8 @@ namespace MapGenerator{
 		int m_mountainWidth = 100;
 		int m_groundLevel = 80;
 
-		Block* m_soilBlock = new Block{0,2};
-		Block* m_stoneBlock = new Block{2,4};
+		int m_soilBlock = 0;
+		int m_stoneBlock = 1;
 
 		void placeBasicTerrain(Map& map, int layer) const;
 	};
@@ -22,9 +22,9 @@ namespace MapGenerator{
 	int getHeight(const Map& map, int x);
 
 	// PUBLIC
-	unique_ptr<Map> generate(const std::string& type, int seed){
+	unique_ptr<Map> generate(const BlockList& blockList, const std::string& type, int seed){
 		unique_ptr<Map> map;
-		map.reset(new Map{1024, 256});
+		map.reset(new Map{blockList, 1024, 256});
 		Biome biome;
 		biome.placeBasicTerrain(*map, 0);
 		biome.placeBasicTerrain(*map, 1);
@@ -47,17 +47,16 @@ namespace MapGenerator{
 			int groundLevel = (int) (heightMap.GetValue(x / (float)m_mountainWidth,0,0) * m_mountainHeight) + m_groundLevel;
 			int dirtHeight = (int) m_soilHeight;// (dirtHeightMap.noise2d(x, 0) * 4) + 4;
 			for(int y = 0; y < map.grid.getHeight() ; y++){
-				Block* block = nullptr;
+				int blockId = -1;
 
 				if (y > groundLevel + dirtHeight) {
 					// stone layer
-					block = m_stoneBlock;
+					blockId = m_stoneBlock;
 				} else if (y > groundLevel) {
 					// dirt layer
-					block = m_soilBlock;
+					blockId = m_soilBlock;
 				}
-				//if (block != nullptr)
-					map.setBlock(x,y,layer,block);
+				map.idAt(x,y,layer) = blockId;
 			}
 		}
 	}
