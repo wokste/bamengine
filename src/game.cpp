@@ -3,24 +3,7 @@
 #include "map/map.h"
 #include "map/maprenderer.h"
 #include "map/mapgenerator.h"
-
-namespace VectorMath
-{
-	template <typename T>
-	constexpr T dot(const sf::Vector2<T>& v1, const sf::Vector2<T>& v2){
-		return v1.x * v2.x + v1.y * v2.y;
-	}
-
-	template <typename T>
-	constexpr T length(const sf::Vector2<T>& self){
-		return std::sqrt(dot(self,self));
-	}
-
-	template <typename T>
-	constexpr sf::Vector2<T> normalize(const sf::Vector2<T>& self){
-		return self / length(self);
-	}
-}
+#include "util/vectormath.h"
 
 class Game : public IGame{
 	std::unique_ptr<Map> mMap;

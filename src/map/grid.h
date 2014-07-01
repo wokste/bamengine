@@ -1,15 +1,6 @@
 #pragma once
-class Block;
 #include <vector>
-
-struct Precondition{};
-struct ComputationError{};
-
-template <typename X, typename A>
-inline void Assert(A assertion)
-{
-    if( !assertion ) throw X();
-}
+#include "../util/assert.h"
 
 template <typename T>
 class Grid {
