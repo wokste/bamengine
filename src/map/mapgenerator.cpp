@@ -13,8 +13,13 @@ namespace MapGenerator{
 		int mMountainWidth = 100;
 		int mGroundLevel = 80;
 
-		int mSoilBlock = 0;
-		int mStoneBlock = 1;
+		int mSoilBlock;
+		int mStoneBlock;
+
+		Biome(const BlockList& blockList){
+			mSoilBlock = blockList.getId("soil");
+			mStoneBlock = blockList.getId("cobble");
+		}
 
 		void placeBasicTerrain(Map& map, int layer) const;
 	};
@@ -25,7 +30,7 @@ namespace MapGenerator{
 	unique_ptr<Map> generate(const BlockList& blockList, const std::string& type, int seed){
 		unique_ptr<Map> map;
 		map.reset(new Map{blockList, 1024, 256});
-		Biome biome;
+		Biome biome(blockList);
 		biome.placeBasicTerrain(*map, 0);
 		biome.placeBasicTerrain(*map, 1);
 
