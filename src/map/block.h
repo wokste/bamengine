@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+typedef uint16_t BlockId;
+
 class Block{
 public:
 	std::string mTag;
@@ -10,6 +12,8 @@ public:
 	bool mSolid;
 
 	Block(){}
+
+	constexpr static BlockId air = 0xffff;
 };
 
 class BlockList{

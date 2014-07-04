@@ -17,7 +17,7 @@ namespace MapGenerator{
 		int mStoneBlock;
 
 		Biome(const BlockList& blockList){
-			mSoilBlock = blockList.getId("soil");
+			mSoilBlock = blockList.getId("dirt");
 			mStoneBlock = blockList.getId("cobble");
 		}
 

@@ -4,6 +4,7 @@
 #include "map/block.h"
 #include "map/maprenderer.h"
 #include "map/mapgenerator.h"
+#include "map/mapserializer.h"
 #include "util/vectormath.h"
 
 class Game : public IGame{
@@ -47,6 +48,16 @@ private:
 			v = VectorMath::normalize(v);
 		v *= camSpeed;
 		return v;
+	}
+
+	void load(const std::string& mapname) override{
+		const std::string totalMapName = "data/maps/" + mapname + ".map";
+		mMap = MapSerializer::readMap(mBlockList, totalMapName);
+	}
+
+	void save(const std::string& mapname) override{
+		const std::string totalMapName = "data/maps/" + mapname + ".map";
+		MapSerializer::writeMap(totalMapName, *mMap);
 	}
 };
 

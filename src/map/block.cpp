@@ -21,7 +21,7 @@ const Block& BlockList::operator[](unsigned i) const{
 int BlockList::getId(const std::string& tag) const{
 	auto iter = std::find_if(begin(mBlocks), end(mBlocks), [&](Block b){return tag == b.mTag;});
 	if (iter == begin(mBlocks))
-		return -1;
+		return Block::air;
 	return std::distance(begin(mBlocks), iter);
 }
 

@@ -27,8 +27,11 @@ int main(){
 		sf::Event event;
 		while (app.pollEvent(event)){
 			// Close window : exit
-			if (event.type == sf::Event::Closed)
+			if (event.type == sf::Event::Closed){
+				std::string mapName = "hello new world";
+				game->save(mapName);
 				app.close();
+			}
 			if (event.type == sf::Event::Resized){
 				setSize(app, event.size.width, event.size.height);
 			}
