@@ -1,4 +1,5 @@
 #include "block.h"
+#include "../util/assert.h"
 #include "../util/csv.h"
 #include <algorithm>
 
@@ -20,8 +21,7 @@ const Block& BlockList::operator[](unsigned i) const{
 
 int BlockList::getId(const std::string& tag) const{
 	auto iter = std::find_if(begin(mBlocks), end(mBlocks), [&](Block b){return tag == b.mTag;});
-	if (iter == begin(mBlocks))
-		return Block::air;
+	Assert<UnknownBlock>(iter != end(mBlocks), tag);
 	return std::distance(begin(mBlocks), iter);
 }
 
