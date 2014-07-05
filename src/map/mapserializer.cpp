@@ -11,7 +11,7 @@ namespace MapSerializer{
 		char c0, c1;
 		is.read (&c0,1);
 		is.read (&c1,1);
-		return (c0<<0) | (c1<<8);
+		return (c0<<8) | (c1<<0);
 	}
 
 	template <typename T>
