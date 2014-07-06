@@ -1,7 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include <memory>
 
 #include "src/game.h"
+#include "src/gui/chatwindow.h"
 
 void setSize(sf::RenderTarget& target, float width, float height);
 
@@ -11,9 +13,13 @@ int main(){
 
 	// Create the main window
 	sf::RenderWindow app(sf::VideoMode(800, 600), "BAM Engine");
+	tgui::Gui gui(app);
+	gui.setGlobalFont("arial.ttf");
+
 	setSize(app, 800, 600);
 
 	std::unique_ptr<IGame> game = IGame::factory();
+	Gui::ChatWindow chatwindow(gui, *game);
 
 	sf::Time next_game_tick;
 	sf::Clock clock;
@@ -28,13 +34,12 @@ int main(){
 		while (app.pollEvent(event)){
 			// Close window : exit
 			if (event.type == sf::Event::Closed){
-				std::string mapName = "hello new world";
-				game->save(mapName);
 				app.close();
 			}
 			if (event.type == sf::Event::Resized){
 				setSize(app, event.size.width, event.size.height);
 			}
+			gui.handleEvent(event);
 		}
 
 		while( clock.getElapsedTime() > next_game_tick && loops < maxFrameskip) {
@@ -52,10 +57,11 @@ int main(){
 		float interpolation = (clock.getElapsedTime() + sf::seconds(1.0 / updatesPerSecond) - next_game_tick).asSeconds() * updatesPerSecond;
 		app.clear();
 		game->display(app, interpolation);
+		gui.draw();
 		app.display();
 	}
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 void setSize(sf::RenderTarget& target, float width, float height){
