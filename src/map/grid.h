@@ -20,11 +20,11 @@ private:
 			}
 		}
 
-		T& at(int x, int y, int layer){
+		inline T& at(int x, int y, int layer){
 			return cells[layer + mNumLayers * (y + mChunkHeight * x)];
 		}
 
-		const T& at(int x, int y, int layer) const{
+		inline const T& at(int x, int y, int layer) const{
 			return cells[layer + mNumLayers * (y + mChunkHeight * x)];
 		}
 	};
