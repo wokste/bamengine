@@ -15,10 +15,12 @@ namespace MapGenerator{
 
 		int mSoilBlock;
 		int mStoneBlock;
+		int mGrassBlock;
 
 		Biome(const BlockList& blockList){
 			mSoilBlock = blockList.getId("dirt");
 			mStoneBlock = blockList.getId("cobble");
+			mGrassBlock = blockList.getId("grass");
 		}
 
 		void placeBasicTerrain(Map& map, int layer) const;
@@ -63,6 +65,8 @@ namespace MapGenerator{
 				} else if (y > groundLevel) {
 					// dirt layer
 					blockId = mSoilBlock;
+				} else if (y == groundLevel){
+					blockId = mGrassBlock;
 				}
 				map.idAt(x,y,layer) = blockId;
 			}
