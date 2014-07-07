@@ -32,6 +32,7 @@ data/*
 *.ogg
 *.wav
 *.ico
+*.ttf
 
 # Project files
 *.depend
