@@ -15,7 +15,7 @@ class MapRenderer {
 
 public:
 	MapRenderer();
-	void render(const Map& map, sf::RenderTarget& renderTarget, int layer);
+	void render(const Map& map, sf::RenderTarget& renderTarget);
 
 private:
 	void updateSprite(sf::Sprite& sprite, int frame, float tileX, float tileY, bool borderLeft, bool borderTop, bool borderRight, bool borderBottom);

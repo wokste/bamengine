@@ -10,7 +10,10 @@ BlockList::BlockList(const std::string& fileName){
 	Block block;
 
 	while(in.read_row(block.mTag, block.mFrameStart, block.mFrameCount)){
-		block.mSolid = true;
+
+		block.mFlags.mBlockPlayer = true;
+		block.mFlags.mSolid = true;
+		block.mFlags.mGravity = true;
 		mBlocks.push_back(block);
 	}
 }

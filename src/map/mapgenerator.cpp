@@ -50,6 +50,9 @@ namespace MapGenerator{
 		for(int x = 0; x < map.getWidth(); x++){
 			noise::module::Perlin heightMap;
 			int groundLevel = (int) (heightMap.GetValue(x / (float)mMountainWidth,0,0) * mMountainHeight) + mGroundLevel;
+			if (layer == 0)
+				groundLevel = std::min(groundLevel, (int) (heightMap.GetValue(x / (float)mMountainWidth,0,-0.03) * mMountainHeight) + mGroundLevel);
+
 			int dirtHeight = (int) mSoilHeight;
 			for(int y = 0; y < map.getHeight(); y++){
 				int blockId = -1;

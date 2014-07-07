@@ -15,6 +15,7 @@ class Map{
 public:
 	Map(const BlockList& list, int w, int h);
 	bool solid(int x, int y, int layer) const;
+	bool blockPlayer(int x, int y, int layer) const;
 	const Block* getBlock(int x, int y, int layer) const;
 	BlockId& idAt(int x, int y, int layer);
 	const BlockId& idAt(int x, int y, int layer) const;

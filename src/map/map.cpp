@@ -12,7 +12,16 @@ bool Map::solid(int x, int y, int layer) const{
 	int id = mGrid.at(x,y,layer);
 	if (id == Block::air)
 		return false;
-	return mList[id].mSolid;
+	return mList[id].mFlags.mSolid;
+}
+
+bool Map::blockPlayer(int x, int y, int layer) const{
+	if (!mGrid.inArea(x,y,layer))
+		return true;
+	int id = mGrid.at(x,y,layer);
+	if (id == Block::air)
+		return false;
+	return mList[id].mFlags.mBlockPlayer;
 }
 
 const Block* Map::getBlock(int x, int y, int layer) const{

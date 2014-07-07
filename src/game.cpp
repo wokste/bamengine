@@ -24,7 +24,7 @@ public:
 
 		// Render the map
 		MapRenderer mapRenderer;
-		mapRenderer.render(*mMap, target, 0);
+		mapRenderer.render(*mMap, target);
 	}
 
 	void logic() override{

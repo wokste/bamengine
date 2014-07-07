@@ -9,7 +9,11 @@ public:
 	std::string mTag;
 	int mFrameStart;
 	int mFrameCount;
-	bool mSolid;
+	struct Flags{
+		int mBlockPlayer : 1;
+		int mSolid : 1;
+		int mGravity : 1;
+	} mFlags;
 
 	Block(){}
 

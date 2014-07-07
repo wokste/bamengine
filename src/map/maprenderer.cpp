@@ -11,7 +11,7 @@ MapRenderer::MapRenderer(){
 	mFramesPerRow = (int)(mTileSet.getSize().x / mOuterTileSize);
 }
 
-void MapRenderer::render(const Map& map, sf::RenderTarget& renderTarget, int layer) {
+void MapRenderer::render(const Map& map, sf::RenderTarget& renderTarget) {
 	const sf::Vector2f screenCenter = renderTarget.getView().getCenter();
 	const sf::Vector2f screenSize = renderTarget.getView().getSize();
 
@@ -22,24 +22,32 @@ void MapRenderer::render(const Map& map, sf::RenderTarget& renderTarget, int lay
 
 	sf::Sprite sprite(mTileSet);
 
-	//glBegin(GL_QUADS);
-	for(int x = minX; x < maxX; x++){
-		for(int y = minY; y < maxY; y++){
-			const Block* block = map.getBlock(x, y, layer);
-			if (block != nullptr){
-				updateSprite(sprite, chooseFrame(block, x, y), x, y,
-					(map.getBlock(x - 1, y, layer) != block),
-					(map.getBlock(x, y - 1, layer) != block),
-					(map.getBlock(x + 1, y, layer) != block),
-					(map.getBlock(x, y + 1, layer) != block));
-				renderTarget.draw(sprite);
+	for (int layer = 0; layer < 3; layer++){
+		if (layer == 0)
+			sprite.setColor(sf::Color(192,192,192));
+		else
+			sprite.setColor(sf::Color(255,255,255));
+
+		for(int x = minX; x < maxX; x++){
+			for(int y = minY; y < maxY; y++){
+				// Don't draw blocks that are obscured by other blocks.
+				if (layer < 1 && map.solid(x,y,1))
+					continue;
+
+				// Draw block
+				const Block* block = map.getBlock(x, y, layer);
+				if (block != nullptr){
+					// Choose coordinates for sprite such that the borders are correct
+					updateSprite(sprite, chooseFrame(block, x, y), x, y,
+						(map.getBlock(x - 1, y, layer) != block),
+						(map.getBlock(x, y - 1, layer) != block),
+						(map.getBlock(x + 1, y, layer) != block),
+						(map.getBlock(x, y + 1, layer) != block));
+					renderTarget.draw(sprite);
+				}
 			}
 		}
 	}
-
-
-
-	//glEnd();
 }
 
 void MapRenderer::updateSprite(sf::Sprite& sprite, int frame, float tileX, float tileY, bool borderLeft, bool borderTop, bool borderRight, bool borderBottom){
