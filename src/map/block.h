@@ -13,6 +13,7 @@ public:
 		int mBlockPlayer : 1;
 		int mSolid : 1;
 		int mGravity : 1;
+		int mTopLayer : 1;
 	} mFlags;
 
 	Block(){}

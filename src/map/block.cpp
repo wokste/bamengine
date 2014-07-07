@@ -4,16 +4,21 @@
 #include <algorithm>
 
 BlockList::BlockList(const std::string& fileName){
-	io::CSVReader<3> in("data/blocks.csv");
-	in.read_header(io::ignore_extra_column, "tag", "frame_start", "frame_count");
+	io::CSVReader<7> in("data/blocks.csv");
+	in.read_header(io::ignore_extra_column, "tag", "frame_start", "frame_count", "solid", "block_player", "gravity", "top_layer");
 
 	Block block;
 
-	while(in.read_row(block.mTag, block.mFrameStart, block.mFrameCount)){
+	char solid;
+	char block_player;
+	char gravity;
+	char top_layer;
 
-		block.mFlags.mBlockPlayer = true;
-		block.mFlags.mSolid = true;
-		block.mFlags.mGravity = true;
+	while(in.read_row(block.mTag, block.mFrameStart, block.mFrameCount, solid, block_player, gravity, top_layer)){
+		block.mFlags.mSolid = (solid == 'y');
+		block.mFlags.mBlockPlayer = (block_player == 'y');
+		block.mFlags.mGravity = (gravity == 'y');
+		block.mFlags.mTopLayer = (top_layer == 'y');
 		mBlocks.push_back(block);
 	}
 }
