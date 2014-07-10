@@ -6,15 +6,18 @@
 #include "map/mapgenerator.h"
 #include "map/mapserializer.h"
 #include "util/vectormath.h"
+#include "util/skybox.h"
 
 class Game : public IGame{
 	std::unique_ptr<Map> mMap;
+	std::unique_ptr<Skybox> mSkybox;
 	sf::Vector2f mCenterPos;
 	const BlockList mBlockList;
 
 public:
 	Game() : mBlockList("data/blocks.csv"){
 		mMap = MapGenerator::generate(mBlockList, "plains", 1337);
+		mSkybox.reset( new Skybox() );
 	}
 
 	void display(sf::RenderTarget& target, float interpolation) override{
@@ -22,12 +25,14 @@ public:
 		v.setCenter(mCenterPos + interpolation * getCameraVelocity());
 		target.setView(v);
 
+		mSkybox->render(target);
 		// Render the map
 		MapRenderer mapRenderer;
 		mapRenderer.render(*mMap, target);
 	}
 
 	void logic() override{
+		mSkybox->tick();
 		mCenterPos += getCameraVelocity();
 	}
 

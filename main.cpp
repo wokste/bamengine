@@ -55,9 +55,10 @@ int main(){
 
 		// Show the frame
 		float interpolation = (clock.getElapsedTime() + sf::seconds(1.0 / updatesPerSecond) - next_game_tick).asSeconds() * updatesPerSecond;
-		app.clear();
+
 		game->display(app, interpolation);
 		gui.draw();
+
 		app.display();
 	}
 
