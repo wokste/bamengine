@@ -4,14 +4,16 @@
 #include <TGUI/TGUI.hpp>
 
 namespace Gui{
-	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mWindow(gui), mChatbox(*mWindow), mTextbox(*mWindow) {
+	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mWindow(gui), mChatbox(*mWindow), mEditbox(*mWindow) {
 		init();
 	}
 
 	void ChatWindow::processLine(){
-		auto text = mTextbox->getText();
-		mChatbox->addLine(text);
-		mTextbox->setText("");
+		auto text = mEditbox->getText();
+		if (text != ""){
+			mChatbox->addLine(text);
+			mEditbox->setText("");
+		}
 	}
 
 	void ChatWindow::init(){
@@ -28,9 +30,9 @@ namespace Gui{
 		mChatbox->setPosition(0, 0);
 
 		//This line crashes
-		//mTextbox->load(stlye);
-		mTextbox->setPosition(0, 100);
-		mTextbox->setSize(300, 30);
-		mTextbox->bindCallback(&ChatWindow::processLine, this, tgui::EditBox::ReturnKeyPressed);
+		mEditbox->load(stlye);
+		mEditbox->setPosition(0, 100);
+		mEditbox->setSize(300, 30);
+		mEditbox->bindCallback(&ChatWindow::processLine, this, tgui::EditBox::ReturnKeyPressed);
 	}
 }

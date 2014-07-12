@@ -7,7 +7,7 @@ namespace Gui{
 	class ChatWindow{
 		tgui::ChildWindow::Ptr mWindow;
 		tgui::ChatBox::Ptr mChatbox;
-		tgui::TextBox::Ptr mTextbox;
+		tgui::EditBox::Ptr mEditbox;
 	public:
 		ChatWindow(tgui::Gui& gui, IGame& game);
 		void processLine();
