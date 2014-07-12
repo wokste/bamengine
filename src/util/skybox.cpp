@@ -11,10 +11,10 @@ Skybox::Skybox(){
 	mPhaseColor[Day] = sf::Color(128,192,255);
 	mPhaseColor[Night] = sf::Color(0,32,64);
 
-	int ticksPerMinute = 25 * 30;
+	int ticksPerMinute = 25 * 60;
 	mPhaseTime[Day] = 5 * ticksPerMinute;
 	mPhaseTime[Night] = 6 * ticksPerMinute;
-	mTicks = mPhaseTime[Day];
+	mTicks = 0;
 	mInterpolationTime = ticksPerMinute * 1;
 }
 
