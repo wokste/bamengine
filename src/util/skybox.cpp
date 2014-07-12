@@ -1,4 +1,5 @@
 #include "skybox.h"
+#include "mathplus.h"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
@@ -10,9 +11,11 @@ Skybox::Skybox(){
 	mPhaseColor[Day] = sf::Color(128,192,255);
 	mPhaseColor[Night] = sf::Color(0,32,64);
 
-	int ticksPerMinute = 25 * 6;
-	mPhaseTime[Day] = 4 * ticksPerMinute;
-	mPhaseTime[Night] = 5 * ticksPerMinute;
+	int ticksPerMinute = 25 * 60;
+	mPhaseTime[Day] = 5 * ticksPerMinute;
+	mPhaseTime[Night] = 6 * ticksPerMinute;
+	mTicks = 0;
+	mInterpolationTime = ticksPerMinute * 0.5;
 }
 
 void Skybox::tick(){
@@ -32,7 +35,19 @@ Skybox::Phase Skybox::getPhase() const{
 void Skybox::render(sf::RenderTarget& window) const{
 	Phase phase = getPhase();
 
-	window.clear(mPhaseColor[phase]);
+	if (mTicks + mInterpolationTime >= mPhaseTime[phase]){
+		auto& oldColor = mPhaseColor[phase];
+		auto& newColor = mPhaseColor[(phase + 1) % Phase::Max];
+
+		double interpolation = 1 - (mPhaseTime[phase] - mTicks) / static_cast<double>(mInterpolationTime);
+
+		window.clear(sf::Color(
+			MathPlus::interpolate(oldColor.r, newColor.r, interpolation),
+			MathPlus::interpolate(oldColor.g, newColor.g, interpolation),
+			MathPlus::interpolate(oldColor.b, newColor.b, interpolation)));
+	} else {
+		window.clear(mPhaseColor[phase]);
+	}
 
 	// Draw the terain
 	sf::Sprite sprite;
