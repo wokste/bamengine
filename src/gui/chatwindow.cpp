@@ -2,16 +2,22 @@
 
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
+#include "../game.h"
 
 namespace Gui{
-	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mWindow(gui), mChatbox(*mWindow), mEditbox(*mWindow) {
+	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mGame(game), mWindow(gui), mChatbox(*mWindow), mEditbox(*mWindow) {
 		init();
 	}
 
 	void ChatWindow::processLine(){
 		auto text = mEditbox->getText();
 		if (text != ""){
-			mChatbox->addLine(text);
+			std::string stdText = text.toAnsiString();
+			if (stdText[0] == '/'){
+				processCheat(stdText);
+			} else {
+				mChatbox->addLine(text);
+			}
 			mEditbox->setText("");
 		}
 	}
@@ -34,5 +40,29 @@ namespace Gui{
 		mEditbox->setPosition(0, 100);
 		mEditbox->setSize(300, 30);
 		mEditbox->bindCallback(&ChatWindow::processLine, this, tgui::EditBox::ReturnKeyPressed);
+	}
+
+	void ChatWindow::processCheat(const std::string& line){
+		std::stringstream stream(line);
+		std::string cheat;
+		stream >> cheat;
+		if (cheat == "/load"){
+			std::string mapname;
+			stream >> mapname;
+			mGame.load(mapname);
+		} else if (cheat == "/save"){
+			std::string mapname;
+			stream >> mapname;
+			mGame.save(mapname);
+		} else if (cheat == "/mapgen"){
+			std::string biome;
+			int seed;
+			stream >> biome >> seed;
+			mGame.generate(biome, seed);
+		}
+	}
+
+	void ChatWindow::resizeScreen(int width, int height){
+
 	}
 }

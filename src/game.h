@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 
 namespace sf {class RenderTarget;}
 
@@ -11,4 +12,6 @@ public:
 
 	virtual void load(const std::string& mapname) = 0;
 	virtual void save(const std::string& mapname) = 0;
+
+	virtual void generate(const std::string& biome, int seed) = 0;
 };

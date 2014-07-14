@@ -8,6 +8,8 @@
 #include "util/vectormath.h"
 #include "util/skybox.h"
 
+#include <sstream>
+
 class Game : public IGame{
 	std::unique_ptr<Map> mMap;
 	std::unique_ptr<Skybox> mSkybox;
@@ -63,6 +65,10 @@ private:
 	void save(const std::string& mapname) override{
 		const std::string totalMapName = "data/maps/" + mapname + ".map";
 		MapSerializer::writeMap(totalMapName, *mMap);
+	}
+
+	void generate(const std::string& biome, int seed) override{
+		mMap = MapGenerator::generate(mBlockList, biome, seed);
 	}
 };
 
