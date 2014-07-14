@@ -4,6 +4,7 @@
 
 #include "src/game.h"
 #include "src/gui/chatwindow.h"
+#include "src/util/assert.h"
 
 void setSize(sf::RenderTarget& target, float width, float height);
 
@@ -80,7 +81,15 @@ public:
 
 int main(){
 	Program program;
+#ifdef NDEBUG
+	try{
+		program.run();
+	} catch (Exception& ex){
+		std::cout << ex.describe();
+	}
+#else
 	program.run();
+#endif
 
 	return 0;
 }
