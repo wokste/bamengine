@@ -24,11 +24,13 @@ namespace MapSerializer{
 
 	std::unique_ptr<Map> readMap(const BlockList& blockList, const std::string& filename){
 		std::ifstream is(filename);
+		Assert<FileException>(is.good(), filename);
 		return readMap(blockList, is);
 	}
 
 	void writeMap(const std::string& filename, const Map& map){
 		std::ofstream os(filename);
+		Assert<FileException>(os.good(), filename);
 		writeMap(os, map);
 	}
 

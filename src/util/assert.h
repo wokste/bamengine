@@ -7,7 +7,17 @@ struct Exception{
 
 struct Precondition{};
 struct ComputationError{};
-struct UnknownBlock : Exception{
+
+struct FileException : public Exception{
+	std::string mFileName;
+	FileException(const std::string& fileName){mFileName = fileName;}
+
+	std::string describe() override{
+		return "could not load/save file " + mFileName;
+	}
+};
+
+struct UnknownBlock : public Exception{
 	std::string mTag;
 	UnknownBlock(const std::string& tag){mTag = tag;}
 

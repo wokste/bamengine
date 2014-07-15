@@ -47,16 +47,16 @@ namespace Gui{
 		std::string cheat;
 		stream >> cheat;
 		if (cheat == "/load"){
-			std::string mapname;
+			std::string mapname = "";
 			stream >> mapname;
 			mGame.load(mapname);
 		} else if (cheat == "/save"){
-			std::string mapname;
+			std::string mapname = "";
 			stream >> mapname;
 			mGame.save(mapname);
 		} else if (cheat == "/mapgen"){
-			std::string biome;
-			int seed;
+			std::string biome = "";
+			int seed = 0;
 			stream >> biome >> seed;
 			mGame.generate(biome, seed);
 		}

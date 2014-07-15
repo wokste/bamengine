@@ -8,7 +8,7 @@
 #include "util/vectormath.h"
 #include "util/skybox.h"
 
-#include <sstream>
+#include <iostream>
 
 class Game : public IGame{
 	std::unique_ptr<Map> mMap;
@@ -59,12 +59,20 @@ private:
 
 	void load(const std::string& mapname) override{
 		const std::string totalMapName = "data/maps/" + mapname + ".map";
-		mMap = MapSerializer::readMap(mBlockList, totalMapName);
+		try {
+			mMap = MapSerializer::readMap(mBlockList, totalMapName);
+		} catch (FileException ex) {
+			std::cout << ex.describe();
+		}
 	}
 
 	void save(const std::string& mapname) override{
 		const std::string totalMapName = "data/maps/" + mapname + ".map";
-		MapSerializer::writeMap(totalMapName, *mMap);
+		try {
+			MapSerializer::writeMap(totalMapName, *mMap);
+		} catch (FileException ex) {
+			std::cout << ex.describe();
+		}
 	}
 
 	void generate(const std::string& biome, int seed) override{
