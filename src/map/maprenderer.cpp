@@ -41,7 +41,7 @@ public:
 					// Don't draw blocks that are obscured by other blocks.
 					if (layer < 1){
 						const Block* frontBlock = map.getBlock(x,y,1);
-						if (frontBlock != nullptr && frontBlock->mGraphics == Block::Graphics::Solid)
+						if (frontBlock != nullptr && !frontBlock->mFlags.mDrawBack)
 							continue;
 					}
 
@@ -77,29 +77,30 @@ public:
 		if (block == nullptr)
 			return;
 
-		int baseframe = block->mFrameStart;
+		int baseframe = block->mFrame;
 		int frameAdds[] = {0,0,0,0};
 
-		if (map.getBlock(x - 1, y, layer) != block){
-			frameAdds[0] |= 1;
-			frameAdds[2] |= 1;
-		}
+		if (block->mFlags.mFrameBorders){
+			if (map.getBlock(x - 1, y, layer) != block){
+				frameAdds[0] |= 1;
+				frameAdds[2] |= 1;
+			}
 
-		if (map.getBlock(x + 1, y, layer) != block){
-			frameAdds[1] |= 1;
-			frameAdds[3] |= 1;
-		}
+			if (map.getBlock(x + 1, y, layer) != block){
+				frameAdds[1] |= 1;
+				frameAdds[3] |= 1;
+			}
 
-		if (map.getBlock(x, y - 1, layer) != block){
-			frameAdds[0] |= 2;
-			frameAdds[1] |= 2;
-		}
+			if (map.getBlock(x, y - 1, layer) != block){
+				frameAdds[0] |= 2;
+				frameAdds[1] |= 2;
+			}
 
-		if (map.getBlock(x, y + 1, layer) != block){
-			frameAdds[2] |= 2;
-			frameAdds[3] |= 2;
+			if (map.getBlock(x, y + 1, layer) != block){
+				frameAdds[2] |= 2;
+				frameAdds[3] |= 2;
+			}
 		}
-
 		renderTile(renderTarget, sprite, baseframe, frameAdds, x, y);
 	}
 };

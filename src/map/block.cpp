@@ -5,35 +5,23 @@
 
 BlockList::BlockList(const std::string& fileName){
 	io::CSVReader<7> in("data/blocks.csv");
-	in.read_header(io::ignore_extra_column, "tag", "frame_start", "frame_count", "graphics", "block_player", "gravity", "top_layer");
+	in.read_header(io::ignore_extra_column, "tag", "frame", "draw_back", "frame_borders", "block_player", "gravity", "top_layer");
 
 	Block block;
 
-	std::string graphics;
+	char draw_back;
+	char frame_borders;
 	char block_player;
 	char gravity;
 	char top_layer;
 
-	while(in.read_row(block.mTag, block.mFrameStart, block.mFrameCount, graphics, block_player, gravity, top_layer)){
-		block.setGraphics(graphics);
+	while(in.read_row(block.mTag, block.mFrame, draw_back, frame_borders, block_player, gravity, top_layer)){
+		block.mFlags.mDrawBack = (draw_back == 'y');
+		block.mFlags.mFrameBorders = (frame_borders == 'y');
 		block.mFlags.mBlockPlayer = (block_player == 'y');
 		block.mFlags.mGravity = (gravity == 'y');
 		block.mFlags.mTopLayer = (top_layer == 'y');
 		mBlocks.push_back(block);
-	}
-}
-
-void Block::setGraphics(const std::string& source){
-	if (source == "nonsolid"){
-		mGraphics = Graphics::NonSolid;
-	} else if (source == "solid"){
-		mGraphics = Graphics::Solid;
-	} else if (source == "repeat_x"){
-		mGraphics = Graphics::RepeatX;
-	} else if (source == "repeat_y"){
-		mGraphics = Graphics::RepeatY;
-	} else {
-		Assert<EnumException>(false, source);
 	}
 }
 

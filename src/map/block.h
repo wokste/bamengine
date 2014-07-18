@@ -11,18 +11,16 @@ public:
 	};
 
 	std::string mTag;
-	int mFrameStart;
-	int mFrameCount;
-	Graphics mGraphics;
+	int mFrame;
 	struct Flags{
+		int mDrawBack : 1;
+		int mFrameBorders : 1;
 		int mBlockPlayer : 1;
 		int mGravity : 1;
 		int mTopLayer : 1;
 	} mFlags;
 
 	Block(){}
-
-	void setGraphics(const std::string& source);
 
 	constexpr static BlockId air = 0xffff;
 };
