@@ -29,8 +29,8 @@ public:
 
 		mSkybox->render(target);
 		// Render the map
-		MapRenderer mapRenderer;
-		mapRenderer.render(*mMap, target);
+		auto mapRenderer = IMapRenderer::factory();
+		mapRenderer->render(*mMap, target);
 	}
 
 	void logic() override{

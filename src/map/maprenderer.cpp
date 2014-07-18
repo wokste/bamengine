@@ -3,88 +3,108 @@
 #include "map.h"
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/OpenGL.hpp>
 
-MapRenderer::MapRenderer(){
-	mTileSet.loadFromFile("data/tileset.png");
-	mFramesPerRow = (int)(mTileSet.getSize().x / mOuterTileSize);
-}
+class MapRenderer : public IMapRenderer {
+	constexpr static int mTileSize = 12;
+	int mFramesPerRow;
+	sf::Texture mTileSet;
 
-void MapRenderer::render(const Map& map, sf::RenderTarget& renderTarget) {
-	const sf::Vector2f screenCenter = renderTarget.getView().getCenter();
-	const sf::Vector2f screenSize = renderTarget.getView().getSize();
+public:
 
-	int minX = std::max(0, (int)(screenCenter.x - screenSize.x / 2) / mInnerTileSize);
-	int maxX = std::min(map.getWidth(), (int)(screenCenter.x + screenSize.x / 2) / mInnerTileSize + 1);
-	int minY = std::max(0, (int)(screenCenter.y - screenSize.y / 2) / mInnerTileSize);
-	int maxY = std::min(map.getHeight(), (int)(screenCenter.y + screenSize.y / 2) / mInnerTileSize + 1);
+	MapRenderer(){
+		mTileSet.loadFromFile("data/tileset2.png");
+		mFramesPerRow = (int)(mTileSet.getSize().x / mTileSize);
+	}
 
-	sf::Sprite sprite(mTileSet);
+	void render(const Map& map, sf::RenderTarget& renderTarget) override{
+		const sf::Vector2f screenCenter = renderTarget.getView().getCenter();
+		const sf::Vector2f screenSize = renderTarget.getView().getSize();
 
-	for (int layer = 0; layer < 3; layer++){
-		if (layer == 0)
-			sprite.setColor(sf::Color(192,192,192));
-		else
-			sprite.setColor(sf::Color(255,255,255));
+		int minX = std::max(0, (int)(screenCenter.x - screenSize.x / 2) / mTileSize);
+		int maxX = std::min(map.getWidth(), (int)(screenCenter.x + screenSize.x / 2) / mTileSize + 1);
+		int minY = std::max(0, (int)(screenCenter.y - screenSize.y / 2) / mTileSize);
+		int maxY = std::min(map.getHeight(), (int)(screenCenter.y + screenSize.y / 2) / mTileSize + 1);
 
-		for(int x = minX; x < maxX; x++){
-			for(int y = minY; y < maxY; y++){
-				// Don't draw blocks that are obscured by other blocks.
-				if (layer < 1 && map.solid(x,y,1))
-					continue;
+		sf::Sprite sprite(mTileSet);
 
-				// Draw block
-				const Block* block = map.getBlock(x, y, layer);
-				if (block != nullptr){
-					// Choose coordinates for sprite such that the borders are correct
-					updateSprite(sprite, chooseFrame(block, x, y), x, y,
-						(map.getBlock(x - 1, y, layer) != block),
-						(map.getBlock(x, y - 1, layer) != block),
-						(map.getBlock(x + 1, y, layer) != block),
-						(map.getBlock(x, y + 1, layer) != block));
-					renderTarget.draw(sprite);
+		for (int layer = 0; layer < 3; layer++){
+			if (layer == 0)
+				sprite.setColor(sf::Color(192,192,192));
+			else
+				sprite.setColor(sf::Color(255,255,255));
+
+			for(int x = minX; x < maxX; x++){
+				for(int y = minY; y < maxY; y++){
+					// Don't draw blocks that are obscured by other blocks.
+					if (layer < 1){
+						const Block* frontBlock = map.getBlock(x,y,1);
+						if (frontBlock != nullptr && frontBlock->mGraphics == Block::Graphics::Solid)
+							continue;
+					}
+
+					// Draw block
+					renderBlock(renderTarget, sprite, map, x, y, layer);
 				}
 			}
 		}
 	}
-}
 
-void MapRenderer::updateSprite(sf::Sprite& sprite, int frame, float tileX, float tileY, bool borderLeft, bool borderTop, bool borderRight, bool borderBottom){
-	int x=tileX * mInnerTileSize;
-	int y=tileY * mInnerTileSize;
+	void renderTile(sf::RenderTarget& renderTarget, sf::Sprite& sprite, int baseFrame, int frameAdds[], int tileX, int tileY){
+		int x=tileX * mTileSize;
+		int y=tileY * mTileSize;
 
-	sf::IntRect rect{
-		(frame % mFramesPerRow) * mOuterTileSize + mBorder,
-		(frame / mFramesPerRow) * mOuterTileSize + mBorder, mInnerTileSize, mInnerTileSize
-	};
+		for (int i = 0; i < 4; i++){
+			int dx = mTileSize / 2 * ((i & 1) != 0);
+			int dy = mTileSize / 2 * ((i & 2) != 0);
 
-	if (borderLeft){
-		rect.left -= mBorder;
-		x -= mBorder;
-		rect.width += mBorder;
-	}
-	if (borderRight){
-		rect.width += mBorder;
-	}
-	if (borderTop){
-		rect.top -= mBorder;
-		y -= mBorder;
-		rect.height += mBorder;
-	}
-	if (borderBottom){
-		rect.height += mBorder;
+			int frame = baseFrame + frameAdds[i];
+			sf::IntRect rect{
+				(frame % mFramesPerRow) * mTileSize + dx,
+				(frame / mFramesPerRow) * mTileSize + dy, 6, 6
+			};
+
+			sprite.setTextureRect(rect);
+			sprite.setPosition(x + dx,y + dy);
+			renderTarget.draw(sprite);
+		}
 	}
 
-	sprite.setTextureRect(rect);
-	sprite.setPosition(x,y);
-}
+	void renderBlock(sf::RenderTarget& renderTarget, sf::Sprite& sprite, const Map& map, int x, int y, int layer){
+		const Block* block = map.getBlock(x, y, layer);
+		if (block == nullptr)
+			return;
 
-int MapRenderer::chooseFrame(const Block* type, int x, int y) const{
-	int seed = x + y * 57;
-	seed ^= seed<<13;
-	  seed=(seed*(seed*60493+19990303)+1376312589)&0x7fffffff;
+		int baseframe = block->mFrameStart;
+		int frameAdds[] = {0,0,0,0};
 
-	return type->mFrameStart + ((seed >> 24) % type->mFrameCount);
+		if (map.getBlock(x - 1, y, layer) != block){
+			frameAdds[0] |= 1;
+			frameAdds[2] |= 1;
+		}
+
+		if (map.getBlock(x + 1, y, layer) != block){
+			frameAdds[1] |= 1;
+			frameAdds[3] |= 1;
+		}
+
+		if (map.getBlock(x, y - 1, layer) != block){
+			frameAdds[0] |= 2;
+			frameAdds[1] |= 2;
+		}
+
+		if (map.getBlock(x, y + 1, layer) != block){
+			frameAdds[2] |= 2;
+			frameAdds[3] |= 2;
+		}
+
+		renderTile(renderTarget, sprite, baseframe, frameAdds, x, y);
+	}
+};
+
+std::unique_ptr<IMapRenderer> IMapRenderer::factory(){
+	return std::unique_ptr<IMapRenderer>(new MapRenderer());
 }
 

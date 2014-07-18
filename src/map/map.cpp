@@ -6,15 +6,6 @@
 Map::Map(const BlockList& list,int w, int h) : mList(list), mGrid(w,h){
 }
 
-bool Map::solid(int x, int y, int layer) const{
-	if (!mGrid.inArea(x,y,layer))
-		return true;
-	int id = mGrid.at(x,y,layer);
-	if (id == Block::air)
-		return false;
-	return mList[id].mFlags.mSolid;
-}
-
 bool Map::blockPlayer(int x, int y, int layer) const{
 	if (!mGrid.inArea(x,y,layer))
 		return true;

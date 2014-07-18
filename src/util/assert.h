@@ -17,6 +17,16 @@ struct FileException : public Exception{
 	}
 };
 
+struct EnumException : public Exception{
+	std::string mValue;
+	EnumException(const std::string& value){mValue = value;}
+
+	std::string describe() override{
+		return "Unknown enum value " + mValue;
+	}
+};
+
+
 struct UnknownBlock : public Exception{
 	std::string mTag;
 	UnknownBlock(const std::string& tag){mTag = tag;}

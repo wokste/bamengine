@@ -42,7 +42,7 @@ namespace MapGenerator{
 	// PRIVATE
 	int getHeight(const Map& map, int x){
 		for(int y = 0; y < map.getHeight(); y++){
-			if (map.solid(x, y, 1))
+			if (map.blockPlayer(x, y, 1))
 				return y;
 		}
 		return -1;

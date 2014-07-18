@@ -1,23 +1,13 @@
 #pragma once
-#include <SFML/Graphics/Texture.hpp>
+#include <memory>
 class Map;
-class RenderTarget;
-class Block;
+namespace sf{
+	class RenderTarget;
+}
 
-namespace sf{ class Sprite;}
-
-class MapRenderer {
-	constexpr static int mInnerTileSize = 12;
-	constexpr static int mBorder = 2;
-	constexpr static int mOuterTileSize = mInnerTileSize + 2 * mBorder;
-	int mFramesPerRow;
-	sf::Texture mTileSet;
-
+class IMapRenderer {
 public:
-	MapRenderer();
-	void render(const Map& map, sf::RenderTarget& renderTarget);
+	static std::unique_ptr<IMapRenderer> factory();
 
-private:
-	void updateSprite(sf::Sprite& sprite, int frame, float tileX, float tileY, bool borderLeft, bool borderTop, bool borderRight, bool borderBottom);
-	int chooseFrame(const Block* type, int x, int y) const;
+	virtual void render(const Map& map, sf::RenderTarget& renderTarget) = 0;
 };
