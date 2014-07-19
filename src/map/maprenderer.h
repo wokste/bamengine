@@ -8,6 +8,7 @@ namespace sf{
 class IMapRenderer {
 public:
 	static std::unique_ptr<IMapRenderer> factory();
+	virtual ~IMapRenderer(){}
 
 	virtual void render(const Map& map, sf::RenderTarget& renderTarget) = 0;
 };

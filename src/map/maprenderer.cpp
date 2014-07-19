@@ -52,18 +52,33 @@ public:
 		}
 	}
 
-	void renderTile(sf::RenderTarget& renderTarget, sf::Sprite& sprite, int baseFrame, int frameAdds[], int tileX, int tileY){
+	void renderTile1(sf::RenderTarget& renderTarget, sf::Sprite& sprite, int frame, int tileX, int tileY){
 		int x=tileX * mTileSize;
 		int y=tileY * mTileSize;
 
+		sf::IntRect rect{
+			(frame % mFramesPerRow) * mTileSize,
+			(frame / mFramesPerRow) * mTileSize, mTileSize, mTileSize
+		};
+
+		sprite.setTextureRect(rect);
+		sprite.setPosition(x,y);
+		renderTarget.draw(sprite);
+	}
+
+	void renderTile4(sf::RenderTarget& renderTarget, sf::Sprite& sprite, int baseFrame, int frameAdds[], int tileX, int tileY){
+		int x=tileX * mTileSize;
+		int y=tileY * mTileSize;
+		constexpr int halfTile = mTileSize / 2;
+
 		for (int i = 0; i < 4; i++){
-			int dx = mTileSize / 2 * ((i & 1) != 0);
-			int dy = mTileSize / 2 * ((i & 2) != 0);
+			int dx = (i & 1) ? halfTile : 0;
+			int dy = (i & 2) ? halfTile : 0;
 
 			int frame = baseFrame + frameAdds[i];
 			sf::IntRect rect{
 				(frame % mFramesPerRow) * mTileSize + dx,
-				(frame / mFramesPerRow) * mTileSize + dy, 6, 6
+				(frame / mFramesPerRow) * mTileSize + dy, halfTile, halfTile
 			};
 
 			sprite.setTextureRect(rect);
@@ -80,32 +95,41 @@ public:
 		int baseframe = block->mFrame;
 		int frameAdds[] = {0,0,0,0};
 
+		bool hasborder = false;
+
 		if (block->mFlags.mFrameBorders){
 			if (map.getBlock(x - 1, y, layer) != block){
 				frameAdds[0] |= 1;
 				frameAdds[2] |= 1;
+				hasborder = true;
 			}
 
 			if (map.getBlock(x + 1, y, layer) != block){
 				frameAdds[1] |= 1;
 				frameAdds[3] |= 1;
+				hasborder = true;
 			}
 
 			if (map.getBlock(x, y - 1, layer) != block){
 				frameAdds[0] |= 2;
 				frameAdds[1] |= 2;
+				hasborder = true;
 			}
 
 			if (map.getBlock(x, y + 1, layer) != block){
 				frameAdds[2] |= 2;
 				frameAdds[3] |= 2;
+				hasborder = true;
 			}
 		}
-		renderTile(renderTarget, sprite, baseframe, frameAdds, x, y);
+
+		if (hasborder)
+			renderTile4(renderTarget, sprite, baseframe, frameAdds, x, y);
+		else
+			renderTile1(renderTarget, sprite, baseframe, x, y);
 	}
 };
 
 std::unique_ptr<IMapRenderer> IMapRenderer::factory(){
 	return std::unique_ptr<IMapRenderer>(new MapRenderer());
 }
-
