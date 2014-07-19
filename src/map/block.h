@@ -6,12 +6,9 @@ typedef uint16_t BlockId;
 
 class Block{
 public:
-	enum class Graphics{
-		Solid, NonSolid, RepeatX, RepeatY
-	};
-
-	std::string mTag;
-	int mFrame;
+	std::string mTag = "";
+	int mFrame = 0;
+	
 	struct Flags{
 		int mDrawBack : 1;
 		int mFrameBorders : 1;
@@ -20,7 +17,7 @@ public:
 		int mTopLayer : 1;
 	} mFlags;
 
-	Block(){}
+	Block() = default;
 
 	constexpr static BlockId air = 0xffff;
 };

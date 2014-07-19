@@ -5,8 +5,12 @@ class IGame;
 
 namespace Gui{
 	class ChatWindow{
+		static constexpr int mWidth = 300;
+		static constexpr int mHeight = 130;
+		static constexpr int mEditboxHeight = 30;
+
 		IGame& mGame;
-		tgui::ChildWindow::Ptr mWindow;
+		tgui::ChildWindow::Ptr mPanel;
 		tgui::ChatBox::Ptr mChatbox;
 		tgui::EditBox::Ptr mEditbox;
 	public:

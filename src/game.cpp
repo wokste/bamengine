@@ -13,7 +13,7 @@
 class Game : public IGame{
 	std::unique_ptr<Map> mMap;
 	std::unique_ptr<Skybox> mSkybox;
-	sf::Vector2f mCenterPos;
+	sf::Vector2f mCenterPos{200.0f,200.0f};
 	const BlockList mBlockList;
 
 public:
@@ -61,7 +61,7 @@ private:
 		const std::string totalMapName = "data/maps/" + mapname + ".map";
 		try {
 			mMap = MapSerializer::readMap(mBlockList, totalMapName);
-		} catch (FileException ex) {
+		} catch (FileException& ex) {
 			std::cout << ex.describe();
 		}
 	}
@@ -70,7 +70,7 @@ private:
 		const std::string totalMapName = "data/maps/" + mapname + ".map";
 		try {
 			MapSerializer::writeMap(totalMapName, *mMap);
-		} catch (FileException ex) {
+		} catch (FileException& ex) {
 			std::cout << ex.describe();
 		}
 	}

@@ -10,7 +10,7 @@ struct ComputationError{};
 
 struct FileException : public Exception{
 	std::string mFileName;
-	FileException(const std::string& fileName){mFileName = fileName;}
+	FileException(const std::string& fileName) : mFileName(fileName){}
 
 	std::string describe() override{
 		return "could not load/save file " + mFileName;
@@ -19,7 +19,7 @@ struct FileException : public Exception{
 
 struct EnumException : public Exception{
 	std::string mValue;
-	EnumException(const std::string& value){mValue = value;}
+	EnumException(const std::string& value) : mValue(value){}
 
 	std::string describe() override{
 		return "Unknown enum value " + mValue;
@@ -29,7 +29,7 @@ struct EnumException : public Exception{
 
 struct UnknownBlock : public Exception{
 	std::string mTag;
-	UnknownBlock(const std::string& tag){mTag = tag;}
+	UnknownBlock(const std::string& tag) : mTag(tag){}
 
 	std::string describe() override{
 		return "unknown block " + mTag;

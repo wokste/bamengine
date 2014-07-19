@@ -12,7 +12,7 @@ Grid::Grid(int width, int height) {
 }
 
 int& Grid::at(int x, int y, int layer){
-	assert (!x >= 0 && y >= 0 && x < width && y < height);
+	assert (!(x >= 0 && y >= 0 && x < width && y < height));
 	int chunkId = x / Chunk.chunkWidth + numChunksX * (y / Chunk.chunkHeight);
 	return chunks[chunkId].at(x % Chunk.chunkWidth, y % Chunk.chunkHeight, layer);
 }

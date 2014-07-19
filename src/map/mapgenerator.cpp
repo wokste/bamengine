@@ -8,10 +8,7 @@ using namespace std;
 
 namespace MapGenerator{
 	struct Biome{
-		int mSoilHeight = 4;
-		int mMountainHeight = 50;
-		int mMountainWidth = 100;
-		int mGroundLevel = 80;
+		int mSoilHeight, mMountainHeight, mMountainWidth, mGroundLevel = 80;
 
 		int mSoilBlock;
 		int mStoneBlock;
@@ -21,6 +18,11 @@ namespace MapGenerator{
 			mSoilBlock = blockList.getId("dirt");
 			mStoneBlock = blockList.getId("cobble");
 			mGrassBlock = blockList.getId("grass");
+			
+			mSoilHeight = 4;
+			mMountainHeight = 50;
+			mMountainWidth = 100;
+			mGroundLevel = 80;
 		}
 
 		void placeBasicTerrain(Map& map, int layer) const;
