@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "src/game.h"
-#include "src/gui/chatwindow.h"
+#include "src/gui/bamgui.h"
 #include "src/util/assert.h"
 
 void setSize(sf::RenderTarget& target, float width, float height);
@@ -14,23 +14,25 @@ class Program{
 
 	sf::View gameView;
 	sf::View guiView;
+	sf::RenderWindow app;
+	tgui::Gui gui;
+	std::unique_ptr<IGame> game;
+	std::unique_ptr<Gui::IBamGui> bamGui;
 
 public:
-	void run(){
-		// Create the main window
-		sf::RenderWindow app(sf::VideoMode(800, 600), "BAM Engine");
-		tgui::Gui gui(app);
+	Program() : app(sf::VideoMode(800, 600), "BAM Engine"), gui(app){
 		gui.setGlobalFont("arial.ttf");
 
+		game = IGame::factory();
+		bamGui = Gui::IBamGui::factory(gui, *game);
+
 		setSize(app, 800, 600);
+	}
 
-		std::unique_ptr<IGame> game = IGame::factory();
-		Gui::ChatWindow chatwindow(gui, *game);
-
+	void run(){
 		sf::Time next_game_tick;
 		sf::Clock clock;
 		int loops;
-		int frames;
 
 		// Start the game loop
 		while (app.isOpen())
@@ -55,9 +57,6 @@ public:
 				loops++;
 			}
 			loops = 0;
-
-			// Calculate fps
-			frames++;
 
 			// Show the frame
 			float interpolation = (clock.getElapsedTime() + sf::seconds(1.0 / updatesPerSecond) - next_game_tick).asSeconds() * updatesPerSecond;
