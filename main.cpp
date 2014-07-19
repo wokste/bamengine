@@ -20,13 +20,13 @@ class Program{
 	std::unique_ptr<Gui::IBamGui> bamGui;
 
 public:
-	Program() : app(sf::VideoMode(800, 600), "BAM Engine"), gui(app){
+	Program() : app(sf::VideoMode(1000, 600), "BAM Engine"), gui(app){
 		gui.setGlobalFont("arial.ttf");
 
 		game = IGame::factory();
 		bamGui = Gui::IBamGui::factory(gui, *game);
 
-		setSize(app, 800, 600);
+		resize(app, 1000, 600);
 	}
 
 	void run(){
@@ -45,7 +45,7 @@ public:
 					app.close();
 				}
 				if (event.type == sf::Event::Resized){
-					setSize(app, event.size.width, event.size.height);
+					resize(app, event.size.width, event.size.height);
 				}
 				gui.handleEvent(event, false);
 			}
@@ -71,10 +71,12 @@ public:
 		}
 	}
 
-	void setSize(sf::RenderTarget& target, float width, float height){
+	void resize(sf::RenderTarget& target, float width, float height){
 		float zoom = 2;
 		gameView.setSize(width / zoom, height / zoom);
 		guiView.setSize(width, height);
+
+		bamGui->resize(width, height);
 	}
 };
 

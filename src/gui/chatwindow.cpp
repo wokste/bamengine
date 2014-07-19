@@ -5,7 +5,7 @@
 #include "../game.h"
 
 namespace Gui{
-	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mGame(game), mWindow(gui), mChatbox(*mWindow), mEditbox(*mWindow) {
+	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mGame(game), mPanel(gui), mChatbox(*mPanel), mEditbox(*mPanel) {
 		init();
 	}
 
@@ -23,22 +23,20 @@ namespace Gui{
 	}
 
 	void ChatWindow::init(){
-		const std::string stlye = "data/widgets/black.conf";
+		const std::string style = "data/widgets/black.conf";
+		mPanel->load(style);
+		mPanel->setSize(mWidth, mHeight);
+		mPanel->setPosition(500, 500);
 
-		mWindow->load(stlye);
-		mWindow->setSize(300, 130);
-		mWindow->setPosition(300, 360);
-		mWindow->setTitle("Console");
-
-		mChatbox->load(stlye);
-		mChatbox->setSize(300, 98);
+		mChatbox->load(style);
+		mChatbox->setSize(mWidth, mHeight - mEditboxHeight - 2);
 		mChatbox->setTextSize(14);
 		mChatbox->setPosition(0, 0);
 
 		//This line crashes
-		mEditbox->load(stlye);
-		mEditbox->setPosition(0, 100);
-		mEditbox->setSize(300, 30);
+		mEditbox->load(style);
+		mEditbox->setPosition(0, mHeight - mEditboxHeight);
+		mEditbox->setSize(mWidth, mEditboxHeight);
 		mEditbox->bindCallback(&ChatWindow::processLine, this, tgui::EditBox::ReturnKeyPressed);
 	}
 
@@ -62,7 +60,12 @@ namespace Gui{
 		}
 	}
 
-	void ChatWindow::resizeScreen(int width, int height){
+	void ChatWindow::resizeScreen(int screenWidth, int screenHeight){
+		int halfScreenWidth = screenWidth / 2;
+		int halfScreenHeight = screenHeight / 2;
 
+		//I have no idea how this technically works, but it seems to move the widget to the bottem-right location.
+		auto size = mPanel->getFullSize();
+		mPanel->setPosition(500 - halfScreenWidth, 500 + halfScreenHeight - size.y);
 	}
 }

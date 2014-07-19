@@ -8,7 +8,7 @@
 #include <SFML/OpenGL.hpp>
 
 class MapRenderer : public IMapRenderer {
-	constexpr static int mTileSize = 12;
+	constexpr static int mTileSize = 8;
 	int mFramesPerRow;
 	sf::Texture mTileSet;
 
