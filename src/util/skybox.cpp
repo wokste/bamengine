@@ -35,13 +35,8 @@ Skybox::Phase Skybox::getPhase() const{
 void Skybox::render(sf::RenderTarget& window) const{
 	renderSky(window);
 
-	if (getPhase() == Phase::Day){
-		sf::IntRect rect(0,0,128,128);
-		renderSun(window, rect, 0, mPhaseTime[Phase::Day] - mInterpolationTime);
-	} else {
-		sf::IntRect rect(128,0,128,128);
-		renderSun(window, rect, mPhaseTime[Phase::Day] - mInterpolationTime, mPhaseTime[Phase::Night]);
-	}
+	renderSun(window, sf::IntRect(0,0,128,128), 0, mPhaseTime[Phase::Day] - mInterpolationTime);
+	renderSun(window, sf::IntRect(128,0,128,128), mPhaseTime[Phase::Day] - mInterpolationTime, mPhaseTime[Phase::Night]);
 
 	renderTerrain(window, 128, 384, 0.3);
 	renderTerrain(window, 128, 256, 0.6);
