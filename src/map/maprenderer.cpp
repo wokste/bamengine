@@ -99,26 +99,22 @@ public:
 
 		if (block->mFlags.mFrameBorders){
 			if (map.getBlock(x - 1, y, layer) != block){
-				frameAdds[0] |= 1;
-				frameAdds[2] |= 1;
+				frameAdds[0] |= 1; frameAdds[2] |= 1;
 				hasborder = true;
 			}
 
 			if (map.getBlock(x + 1, y, layer) != block){
-				frameAdds[1] |= 1;
-				frameAdds[3] |= 1;
+				frameAdds[1] |= 1; frameAdds[3] |= 1;
 				hasborder = true;
 			}
 
 			if (map.getBlock(x, y - 1, layer) != block){
-				frameAdds[0] |= 2;
-				frameAdds[1] |= 2;
+				frameAdds[0] |= 2; frameAdds[1] |= 2;
 				hasborder = true;
 			}
 
 			if (map.getBlock(x, y + 1, layer) != block){
-				frameAdds[2] |= 2;
-				frameAdds[3] |= 2;
+				frameAdds[2] |= 2; frameAdds[3] |= 2;
 				hasborder = true;
 			}
 		}
