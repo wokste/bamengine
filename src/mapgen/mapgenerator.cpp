@@ -2,6 +2,7 @@
 #include "mapstructure.h"
 #include "../map/map.h"
 #include "../map/block.h"
+#include "../util/tokenstream.h"
 
 #include <noise/noise.h>
 #include <random>
@@ -25,6 +26,10 @@ namespace MapGenerator{
 			mMountainHeight = 50;
 			mMountainWidth = 100;
 			mGroundLevel = 80;
+
+			std::string data("array(vein(0.003,gem1,10,0.1),vein(0.01,gem2,10,0.2),vein(0.015,gem3,10,0.5))");
+			TokenStream stream(data);
+			mapStructures = makeStructureVector(stream, blockList);
 		}
 
 		void placeBasicTerrain(Map& map, int layer) const;
