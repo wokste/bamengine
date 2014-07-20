@@ -3,8 +3,8 @@
 #include "map/map.h"
 #include "map/block.h"
 #include "map/maprenderer.h"
-#include "map/mapgenerator.h"
 #include "map/mapserializer.h"
+#include "mapgen/mapgenerator.h"
 #include "util/vectormath.h"
 #include "util/skybox.h"
 
