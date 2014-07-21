@@ -1,5 +1,6 @@
 #include "tokenstream.h"
 #include <cstdlib>
+#include "assert.h"
 
 //
 // TokenStream
@@ -11,6 +12,7 @@ TokenStream::TokenStream(const std::string& data) : mData(data), mPos(0){
 }
 
 std::string TokenStream::readString(){
+	Assert<StreamException>(mHasArguments, "Missing argument", mData, mPos);
 	int start = mPos;
 	while(!isSpecialChar(peek()) && !isWhitespace(peek())){
 		mPos++;
@@ -42,19 +44,16 @@ bool TokenStream::hasArguments(){
 }
 
 bool TokenStream::push(){
-	if (readSpecialChar('(')){
-		mHasArguments = (peek() != ')');
-		return true;
-	}
-	return false;
+	Assert<StreamException>(readSpecialChar('('), "Missing (", mData, mPos);
+
+	mHasArguments = (peek() != ')');
+	return true;
 }
 
 bool TokenStream::pop(){
-	if (readSpecialChar(')')){
-		mHasArguments = readSpecialChar(',');
-		return true;
-	}
-	return false;
+	Assert<StreamException>(readSpecialChar(')'), "Missing ) or too many arguments", mData, mPos);
+	mHasArguments = readSpecialChar(',');
+	return true;
 }
 
 char TokenStream::peek(){

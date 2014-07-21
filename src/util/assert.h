@@ -1,38 +1,37 @@
 #pragma once
 #include <string>
+#include <cmath>
 
-struct Exception{
-	virtual std::string describe() = 0;
+class Exception{
+protected:
+	std::string mError;
+public:
+	Exception(const std::string& error) : mError(error){}
+	std::string describe() {return mError;}
+	virtual ~Exception(){}
 };
 
 struct Precondition{};
 struct ComputationError{};
 
 struct FileException : public Exception{
-	std::string mFileName;
-	FileException(const std::string& fileName) : mFileName(fileName){}
-
-	std::string describe() override{
-		return "could not load/save file " + mFileName;
-	}
+	FileException(const std::string& fileName) : Exception("could not load/save file " + fileName){}
 };
 
 struct EnumException : public Exception{
-	std::string mValue;
-	EnumException(const std::string& value) : mValue(value){}
-
-	std::string describe() override{
-		return "Unknown enum value " + mValue;
-	}
+	EnumException(const std::string& enumName, const std::string& value) : Exception("Unknown enum value " + value + " for enum " + enumName){}
 };
 
-
 struct UnknownBlock : public Exception{
-	std::string mTag;
-	UnknownBlock(const std::string& tag) : mTag(tag){}
+	UnknownBlock(const std::string& value) : Exception("Unknown block " + value){}
+};
 
-	std::string describe() override{
-		return "unknown block " + mTag;
+struct StreamException : public Exception{
+	StreamException(const std::string& error, const std::string& source, int pos) : Exception(""){
+		int start = std::max(0, pos - 5);
+		int end = std::min(pos + 5, static_cast<int>(source.length()));
+
+		mError = error + "\nin " + source + "\nnear '" + source.substr(start,end) + "'";
 	}
 };
 
