@@ -13,13 +13,18 @@ namespace MapGenerator{
 		int mSoilHeight, mMountainHeight, mMountainWidth, mGroundLevel = 80;
 
 		int mSoilBlock;
-		int mStoneBlock;
+		std::vector<std::pair<int,int>> mStoneBlocks;
 		int mGrassBlock;
 		std::vector<std::unique_ptr<IMapStructure>> mapStructures;
 
 		Biome(const BlockList& blockList){
 			mSoilBlock = blockList.getId("dirt");
-			mStoneBlock = blockList.getId("cobble");
+
+			mStoneBlocks.emplace_back(20,blockList.getId("cobble"));
+			mStoneBlocks.emplace_back(5,blockList.getId("dirt"));
+			mStoneBlocks.emplace_back(15,blockList.getId("gravel"));
+			mStoneBlocks.emplace_back(5,blockList.getId("sand"));
+
 			mGrassBlock = blockList.getId("grass");
 
 			mSoilHeight = 4;
@@ -32,24 +37,24 @@ namespace MapGenerator{
 			mapStructures = makeStructureVector(stream, blockList);
 		}
 
-		void placeBasicTerrain(Map& map, int layer) const;
+		void placeBasicTerrain(Map& map, std::mt19937& random) const;
+		int chooseStoneBlock(double value) const;
 	};
 
 	int getHeight(const Map& map, int x);
 
 	// PUBLIC
 	unique_ptr<Map> generate(const BlockList& blockList, const std::string& type, int seed){
-		std::mt19937 gen;
-		gen.seed(seed);
+		std::mt19937 rnd;
+		rnd.seed(seed);
 
 		unique_ptr<Map> map;
 		map.reset(new Map{blockList, 1024, 256});
-		Biome biome(blockList);
-		biome.placeBasicTerrain(*map, 0);
-		biome.placeBasicTerrain(*map, 1);
+		const Biome biome(blockList);
+		biome.placeBasicTerrain(*map, rnd);
 
 		for (auto& mapStructure : biome.mapStructures){
-			mapStructure->placeMany(*map, gen);
+			mapStructure->placeMany(*map, rnd);
 		}
 
 		return map;
@@ -64,28 +69,56 @@ namespace MapGenerator{
 		return -1;
 	}
 
-	void Biome::placeBasicTerrain(Map& map, int layer) const{
-		for(int x = 0; x < map.getWidth(); x++){
-			noise::module::Perlin heightMap;
-			int groundLevel = (int) (heightMap.GetValue(x / (float)mMountainWidth,0,0) * mMountainHeight) + mGroundLevel;
-			if (layer == 0)
-				groundLevel = std::min(groundLevel, (int) (heightMap.GetValue(x / (float)mMountainWidth,0,-0.03) * mMountainHeight) + mGroundLevel);
+	void Biome::placeBasicTerrain(Map& map, std::mt19937& random) const{
+		std::uniform_int_distribution<int> seedDist(0, (1 << 16) - 1);
+		noise::module::Perlin heightMap;
+		noise::module::Voronoi voronoi;
+		noise::module::Turbulence areas;
+		heightMap.SetSeed(seedDist(random));
+		voronoi.SetSeed(seedDist(random));
+		voronoi.SetFrequency(0.1);
+		areas.SetSeed(seedDist(random));
+		areas.SetSourceModule(0,voronoi);
+		areas.SetFrequency(0.2);
 
-			int dirtHeight = (int) mSoilHeight;
-			for(int y = 0; y < map.getHeight(); y++){
-				int blockId = -1;
+		for(int layer = 0; layer < 2; layer++){
+			for(int x = 0; x < map.getWidth(); x++){
+				int groundLevel = (int) (heightMap.GetValue(x / (float)mMountainWidth,0,0) * mMountainHeight) + mGroundLevel;
+				if (layer == 0)
+					groundLevel = std::min(groundLevel, (int) (heightMap.GetValue(x / (float)mMountainWidth,0,-0.03) * mMountainHeight) + mGroundLevel);
 
-				if (y > groundLevel + dirtHeight) {
-					// stone layer
-					blockId = mStoneBlock;
-				} else if (y > groundLevel) {
-					// dirt layer
-					blockId = mSoilBlock;
-				} else if (y == groundLevel){
-					blockId = mGrassBlock;
+				int dirtHeight = (int) mSoilHeight;
+				for(int y = 0; y < map.getHeight(); y++){
+					int blockId = -1;
+
+					if (y > groundLevel + dirtHeight) {
+						// stone layer
+						blockId = chooseStoneBlock(areas.GetValue(x,y,0));
+					} else if (y > groundLevel) {
+						// dirt layer
+						blockId = mSoilBlock;
+					} else if (y == groundLevel){
+						blockId = mGrassBlock;
+					}
+					map.idAt(x,y,layer) = blockId;
 				}
-				map.idAt(x,y,layer) = blockId;
 			}
 		}
+	}
+
+	int Biome::chooseStoneBlock(double value) const{
+		int maxValue = 0;
+		for (auto& pair : mStoneBlocks){
+			maxValue += pair.first;
+		}
+
+		int valueAsInt = (value + 1) / 2 * maxValue;
+
+		for (auto& pair : mStoneBlocks){
+			valueAsInt -= pair.first;
+			if (valueAsInt < 0)
+				return pair.second;
+		}
+		return Block::air;
 	}
 }
