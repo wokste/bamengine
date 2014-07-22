@@ -25,6 +25,6 @@ public:
 	void tick();
 private:
 	void renderSky(sf::RenderTarget& window) const;
-	void renderTerrain(sf::RenderTarget& window, int top, int height, double speed) const;
+	void renderTerrain(sf::RenderTarget& window, int top, int height, double scale, double zIndex) const;
 	void renderSun(sf::RenderTarget& window, const sf::IntRect& rect, int tickStart, int tickEnd) const;
 };

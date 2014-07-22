@@ -15,11 +15,13 @@ class Game : public IGame{
 	std::unique_ptr<Skybox> mSkybox;
 	sf::Vector2f mCenterPos{200.0f,200.0f};
 	const BlockList mBlockList;
+	std::unique_ptr<IMapRenderer> mMapRenderer;
 
 public:
 	Game() : mBlockList("data/blocks.csv"){
 		mMap = MapGenerator::generate(mBlockList, "plains", 1337);
 		mSkybox.reset( new Skybox() );
+		mMapRenderer = IMapRenderer::factory();
 	}
 
 	void display(sf::RenderTarget& target, float interpolation) override{
@@ -29,8 +31,7 @@ public:
 
 		mSkybox->render(target);
 		// Render the map
-		auto mapRenderer = IMapRenderer::factory();
-		mapRenderer->render(*mMap, target);
+		mMapRenderer->render(*mMap, target);
 	}
 
 	void logic() override{

@@ -5,7 +5,7 @@
 #include "../game.h"
 
 namespace Gui{
-	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mGame(game), mPanel(gui), mChatbox(*mPanel), mEditbox(*mPanel) {
+	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mGame(game), mChatbox(gui), mEditbox(gui) {
 		init();
 	}
 
@@ -24,10 +24,6 @@ namespace Gui{
 
 	void ChatWindow::init(){
 		const std::string style = "data/widgets/black.conf";
-		mPanel->load(style);
-		mPanel->setSize(mWidth, mHeight);
-		mPanel->setPosition(500, 500);
-
 		mChatbox->load(style);
 		mChatbox->setSize(mWidth, mHeight - mEditboxHeight - 2);
 		mChatbox->setTextSize(14);
@@ -65,7 +61,7 @@ namespace Gui{
 		int halfScreenHeight = screenHeight / 2;
 
 		//I have no idea how this technically works, but it seems to move the widget to the bottem-right location.
-		auto size = mPanel->getFullSize();
-		mPanel->setPosition(500 - halfScreenWidth, 500 + halfScreenHeight - size.y);
+		mChatbox->setPosition(500 - halfScreenWidth, 500 + halfScreenHeight - 130);
+		mEditbox->setPosition(500 - halfScreenWidth, 500 + halfScreenHeight - 30);
 	}
 }

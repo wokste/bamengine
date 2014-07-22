@@ -15,7 +15,7 @@ class MapRenderer : public IMapRenderer {
 public:
 
 	MapRenderer(){
-		mTileSet.loadFromFile("data/tileset2.png");
+		mTileSet.loadFromFile("data/tileset.png");
 		mFramesPerRow = (int)(mTileSet.getSize().x / mTileSize);
 	}
 

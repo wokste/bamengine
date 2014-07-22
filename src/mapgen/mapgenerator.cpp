@@ -75,35 +75,44 @@ namespace MapGenerator{
 		noise::module::Voronoi voronoi;
 		noise::module::Turbulence areas;
 		heightMap.SetSeed(seedDist(random));
+		heightMap.SetFrequency(1.0 / mMountainWidth);
 		voronoi.SetSeed(seedDist(random));
 		voronoi.SetFrequency(0.1);
 		areas.SetSeed(seedDist(random));
 		areas.SetSourceModule(0,voronoi);
 		areas.SetFrequency(0.2);
 
-		for(int layer = 0; layer < 2; layer++){
-			for(int x = 0; x < map.getWidth(); x++){
-				int groundLevel = (int) (heightMap.GetValue(x / (float)mMountainWidth,0,0) * mMountainHeight) + mGroundLevel;
-				if (layer == 0)
-					groundLevel = std::min(groundLevel, (int) (heightMap.GetValue(x / (float)mMountainWidth,0,-0.03) * mMountainHeight) + mGroundLevel);
+		for(int x = 0; x < map.getWidth(); x++){
+			int groundLevel = (int) (heightMap.GetValue(x,0,0) * mMountainHeight) + mGroundLevel;
 
-				int dirtHeight = (int) mSoilHeight;
-				for(int y = 0; y < map.getHeight(); y++){
-					int blockId = -1;
+			int dirtHeight = (int) mSoilHeight;
+			for(int y = 0; y < map.getHeight(); y++){
+				int blockId = Block::air;
 
-					if (y > groundLevel + dirtHeight) {
-						// stone layer
-						blockId = chooseStoneBlock(areas.GetValue(x,y,0));
-					} else if (y > groundLevel) {
-						// dirt layer
-						blockId = mSoilBlock;
-					} else if (y == groundLevel){
-						blockId = mGrassBlock;
-					}
+				if (y > groundLevel + dirtHeight) {
+					// stone layer
+					blockId = chooseStoneBlock(areas.GetValue(x,y,0));
+				} else if (y > groundLevel) {
+					// dirt layer
+					blockId = mSoilBlock;
+				} else if (y == groundLevel){
+					blockId = mGrassBlock;
+				}
+
+				for(int layer = 0; layer < 2; layer++){
 					map.idAt(x,y,layer) = blockId;
 				}
 			}
 		}
+
+		/*for(int x = 0; x < map.getWidth(); x++){
+			for(int y = 0; y < map.getHeight(); y++){
+				if ((x & 3) || (y & 3)){
+					for(int layer = 0; layer < 2; layer++)
+						map.idAt(x,y,layer) = map.idAt(x & ~3,y & ~3,layer);
+				}
+			}
+		}*/
 	}
 
 	int Biome::chooseStoneBlock(double value) const{

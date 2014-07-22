@@ -10,7 +10,6 @@ namespace Gui{
 		static constexpr int mEditboxHeight = 30;
 
 		IGame& mGame;
-		tgui::ChildWindow::Ptr mPanel;
 		tgui::ChatBox::Ptr mChatbox;
 		tgui::EditBox::Ptr mEditbox;
 	public:

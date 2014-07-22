@@ -3,16 +3,16 @@
 
 namespace Gui{
 	class BamGui : public IBamGui{
-		ChatWindow chatWindow;
+		//ChatWindow chatWindow;
 
 	public:
 		BamGui(tgui::Gui& gui, IGame& game)
-			: chatWindow(gui, game)
+			//: chatWindow(gui, game)
 		{
 		}
 
 		virtual void resize(int width, int height){
-			chatWindow.resizeScreen(width, height);
+			//chatWindow.resizeScreen(width, height);
 		}
 	};
 
