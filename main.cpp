@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include <TGUI/TGUI.hpp>
 #include <memory>
+#include <iostream>
 
 #include "src/game.h"
 #include "src/gui/bamgui.h"
@@ -13,19 +13,12 @@ class Program{
 	constexpr static float maxFrameskip = 5;
 
 	sf::View gameView;
-	sf::View guiView;
 	sf::RenderWindow app;
-	tgui::Gui gui;
 	std::unique_ptr<IGame> game;
-	std::unique_ptr<Gui::IBamGui> bamGui;
 
 public:
-	Program() : app(sf::VideoMode(1000, 600), "BAM Engine"), gui(app){
-		gui.setGlobalFont("arial.ttf");
-
+	Program() : app(sf::VideoMode(1000, 600), "BAM Engine"){
 		game = IGame::factory();
-		bamGui = Gui::IBamGui::factory(gui, *game);
-
 		resize(app, 1000, 600);
 	}
 
@@ -47,7 +40,6 @@ public:
 				if (event.type == sf::Event::Resized){
 					resize(app, event.size.width, event.size.height);
 				}
-				gui.handleEvent(event, false);
 			}
 
 			while( clock.getElapsedTime() > next_game_tick && loops < maxFrameskip) {
@@ -64,9 +56,6 @@ public:
 			app.setView(gameView);
 			game->display(app, interpolation);
 
-			app.setView(guiView);
-			gui.draw(false);
-
 			app.display();
 		}
 	}
@@ -74,9 +63,6 @@ public:
 	void resize(sf::RenderTarget& target, float width, float height){
 		float zoom = 2;
 		gameView.setSize(width / zoom, height / zoom);
-		guiView.setSize(width, height);
-
-		bamGui->resize(width, height);
 	}
 };
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <TGUI/TGUI.hpp>
+#include <string>
 
 class IGame;
 
@@ -10,10 +10,8 @@ namespace Gui{
 		static constexpr int mEditboxHeight = 30;
 
 		IGame& mGame;
-		tgui::ChatBox::Ptr mChatbox;
-		tgui::EditBox::Ptr mEditbox;
 	public:
-		ChatWindow(tgui::Gui& gui, IGame& game);
+		ChatWindow(IGame& game);
 		void processLine();
 		void processCheat(const std::string& line);
 		void resizeScreen(int width, int height);

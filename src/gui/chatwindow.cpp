@@ -1,39 +1,28 @@
 #include "chatwindow.h"
 
 #include <SFML/Graphics.hpp>
-#include <TGUI/TGUI.hpp>
+#include <sstream>
 #include "../game.h"
 
 namespace Gui{
-	ChatWindow::ChatWindow(tgui::Gui& gui, IGame& game) : mGame(game), mChatbox(gui), mEditbox(gui) {
+	ChatWindow::ChatWindow(IGame& game) : mGame(game){
 		init();
 	}
 
 	void ChatWindow::processLine(){
-		auto text = mEditbox->getText();
+		std::string text = ""; //TODO: load text; mEditbox->getText();
 		if (text != ""){
-			std::string stdText = text.toAnsiString();
-			if (stdText[0] == '/'){
-				processCheat(stdText);
+			if (text[0] == '/'){
+				processCheat(text);
 			} else {
-				mChatbox->addLine(text);
+				//mChatbox->addLine(text);
 			}
-			mEditbox->setText("");
+			//mEditbox->setText("");
 		}
 	}
 
 	void ChatWindow::init(){
-		const std::string style = "data/widgets/black.conf";
-		mChatbox->load(style);
-		mChatbox->setSize(mWidth, mHeight - mEditboxHeight - 2);
-		mChatbox->setTextSize(14);
-		mChatbox->setPosition(0, 0);
 
-		//This line crashes
-		mEditbox->load(style);
-		mEditbox->setPosition(0, mHeight - mEditboxHeight);
-		mEditbox->setSize(mWidth, mEditboxHeight);
-		mEditbox->bindCallback(&ChatWindow::processLine, this, tgui::EditBox::ReturnKeyPressed);
 	}
 
 	void ChatWindow::processCheat(const std::string& line){
@@ -57,11 +46,5 @@ namespace Gui{
 	}
 
 	void ChatWindow::resizeScreen(int screenWidth, int screenHeight){
-		int halfScreenWidth = screenWidth / 2;
-		int halfScreenHeight = screenHeight / 2;
-
-		//I have no idea how this technically works, but it seems to move the widget to the bottem-right location.
-		mChatbox->setPosition(500 - halfScreenWidth, 500 + halfScreenHeight - 130);
-		mEditbox->setPosition(500 - halfScreenWidth, 500 + halfScreenHeight - 30);
 	}
 }
