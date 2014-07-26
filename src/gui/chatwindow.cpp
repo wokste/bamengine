@@ -2,27 +2,34 @@
 
 #include <SFML/Graphics.hpp>
 #include <sstream>
+
 #include "../game.h"
 
 namespace Gui{
-	ChatWindow::ChatWindow(IGame& game) : mGame(game){
-		init();
+	ChatWindow::ChatWindow(sfg::Desktop& desktop, IGame& game) : mGame(game){
+		init(desktop);
 	}
 
 	void ChatWindow::processLine(){
-		std::string text = ""; //TODO: load text; mEditbox->getText();
+		std::string text = mTextBox->GetText();
 		if (text != ""){
 			if (text[0] == '/'){
 				processCheat(text);
 			} else {
-				//mChatbox->addLine(text);
+				std::string lines = mChatbox->GetText();
+
+				lines += "\n";
+				lines += text;
+
+				mChatbox->SetText(lines);
 			}
-			//mEditbox->setText("");
+			mTextBox->SetText("");
 		}
 	}
 
-	void ChatWindow::init(){
-
+	void ChatWindow::init(sfg::Desktop& desktop){
+		mWindow = sfg::Window::Create();
+		mWindow->SetTitle( "Hello world!" );
 	}
 
 	void ChatWindow::processCheat(const std::string& line){
@@ -48,3 +55,4 @@ namespace Gui{
 	void ChatWindow::resizeScreen(int screenWidth, int screenHeight){
 	}
 }
+
