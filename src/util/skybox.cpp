@@ -39,9 +39,9 @@ void Skybox::render(sf::RenderTarget& window) const{
 	renderSun(window, sf::IntRect(0,0,64,64), 0, mPhaseTime[Phase::Day] - mInterpolationTime);
 	renderSun(window, sf::IntRect(64,0,64,64), mPhaseTime[Phase::Day] - mInterpolationTime, mPhaseTime[Phase::Night]);
 
-	renderTerrain(window, 64, 192, 0.5, 0.25);
-	renderTerrain(window, 64, 192, 1, 0.5);
-	renderTerrain(window, 64, 192, 1.5, 0.75);
+	int numLayers = 4;
+	for (int i = 1; i < numLayers + 1; i++)
+		renderTerrain(window, 64, 192, (i * 2 / static_cast<double>(numLayers + 1)), (i / static_cast<double>(numLayers + 1)));
 }
 
 void Skybox::renderSky(sf::RenderTarget& window) const{
@@ -74,9 +74,9 @@ void Skybox::renderTerrain(sf::RenderTarget& window, int imgTop, int imgHeight, 
 	sprite.setPosition(worldPos);
 	sprite.setScale(sf::Vector2f(scale, scale));
 
-	int skyLeft = static_cast<int>(window.getView().getCenter().x * zIndex);
+	int skyLeft = static_cast<int>(window.getView().getCenter().x * 0.5);
 
-	sprite.setTextureRect(sf::IntRect(skyLeft, imgTop, windowSize.x, imgHeight));
+	sprite.setTextureRect(sf::IntRect(skyLeft, imgTop, windowSize.x / scale, imgHeight));
 
 	window.draw(sprite);
 }
