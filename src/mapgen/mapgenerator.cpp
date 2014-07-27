@@ -38,6 +38,7 @@ namespace MapGenerator{
 		}
 
 		void placeBasicTerrain(Map& map, std::mt19937& random) const;
+		void placeHeightMap(Map& map, std::mt19937& random) const;
 		int chooseStoneBlock(double value) const;
 	};
 
@@ -49,9 +50,10 @@ namespace MapGenerator{
 		rnd.seed(seed);
 
 		unique_ptr<Map> map;
-		map.reset(new Map{blockList, 1024, 256});
+		map.reset(new Map{blockList, 2048, 512});
 		const Biome biome(blockList);
 		biome.placeBasicTerrain(*map, rnd);
+		biome.placeHeightMap(*map, rnd);
 
 		for (auto& mapStructure : biome.mapStructures){
 			mapStructure->placeMany(*map, rnd);
@@ -69,35 +71,14 @@ namespace MapGenerator{
 		return -1;
 	}
 
+	void placeFineGrainTerrain(Map& map, std::mt19937& random, int scale);
+
 	void Biome::placeBasicTerrain(Map& map, std::mt19937& random) const{
-		std::uniform_int_distribution<int> seedDist(0, (1 << 16) - 1);
-		noise::module::Perlin heightMap;
-		noise::module::Voronoi voronoi;
-		noise::module::Turbulence areas;
-		heightMap.SetSeed(seedDist(random));
-		heightMap.SetFrequency(1.0 / mMountainWidth);
-		voronoi.SetSeed(seedDist(random));
-		voronoi.SetFrequency(0.1);
-		areas.SetSeed(seedDist(random));
-		areas.SetSourceModule(0,voronoi);
-		areas.SetFrequency(0.2);
+		std::uniform_real_distribution<double> dist(0, 1);
 
-		for(int x = 0; x < map.getWidth(); x++){
-			int groundLevel = (int) (heightMap.GetValue(x,0,0) * mMountainHeight) + mGroundLevel;
-
-			int dirtHeight = (int) mSoilHeight;
-			for(int y = 0; y < map.getHeight(); y++){
-				int blockId = Block::air;
-
-				if (y > groundLevel + dirtHeight) {
-					// stone layer
-					blockId = chooseStoneBlock(areas.GetValue(x,y,0));
-				} else if (y > groundLevel) {
-					// dirt layer
-					blockId = mSoilBlock;
-				} else if (y == groundLevel){
-					blockId = mGrassBlock;
-				}
+		for(int x = 0; x < map.getWidth(); x+= 16){
+			for(int y = 0; y < map.getHeight(); y+= 16){
+				int blockId = chooseStoneBlock(dist(random));
 
 				for(int layer = 0; layer < 2; layer++){
 					map.idAt(x,y,layer) = blockId;
@@ -105,15 +86,77 @@ namespace MapGenerator{
 			}
 		}
 
-		/*for(int x = 0; x < map.getWidth(); x++){
-			for(int y = 0; y < map.getHeight(); y++){
-				if ((x & 3) || (y & 3)){
-					for(int layer = 0; layer < 2; layer++)
-						map.idAt(x,y,layer) = map.idAt(x & ~3,y & ~3,layer);
+		placeFineGrainTerrain(map, random, 16);
+		placeFineGrainTerrain(map, random, 8);
+		placeFineGrainTerrain(map, random, 4);
+		placeFineGrainTerrain(map, random, 2);
+	}
+
+	void placeFineGrainTerrain(Map& map, std::mt19937& random, int scale){
+		int half = scale / 2;
+		for (int x = 0; x < map.getWidth(); x+=scale){
+			for (int y = 0; y < map.getHeight(); y+=scale){
+				int xs = x;
+				int ys = y;
+
+				xs += ((random() & 1) == 1) ? scale : 0;
+				ys += ((random() & 1) == 1) ? scale : 0;
+
+				xs %= map.getWidth();
+				ys %= map.getHeight();
+
+				map.idAt(x + half,y + half,0) = map.idAt(xs,ys,0);
+				map.idAt(x + half,y + half,1) = map.idAt(xs,ys,1);
+			}
+		}
+
+		for (int x = 0; x < map.getWidth(); x+=half){
+			for (int y = 0; y < map.getHeight(); y+=half){
+				if ((x & half) == (y & half))
+					continue;
+				int xs = x;
+				int ys = y;
+				if ((random() & 1) == 1)
+					xs += ((random() & 1) == 1) ? half : -half;
+				else
+					ys += ((random() & 1) == 1) ? half : -half;
+
+				xs = (xs + map.getWidth()) % map.getWidth();
+				ys = (ys + map.getHeight()) % map.getHeight();
+
+				map.idAt(x,y,0) = map.idAt(xs,ys,0);
+				map.idAt(x,y,1) = map.idAt(xs,ys,1);
+			}
+		}
+	}
+
+	void Biome::placeHeightMap(Map& map, std::mt19937& random) const{
+		std::uniform_int_distribution<int> seedDist(0, (1 << 16) - 1);
+		noise::module::Perlin heightMap;
+		heightMap.SetSeed(seedDist(random));
+		heightMap.SetFrequency(1.0 / mMountainWidth);
+
+		for(int x = 0; x < map.getWidth(); x++){
+			double alpha = x / static_cast<double>(map.getWidth()) * 2 * 3.141592;
+			double r = map.getWidth() / 2 / 3.141592;
+
+			int groundLevel = map.getHeight();
+			for(int layer = 0; layer < 2; layer++){
+				groundLevel = std::min(groundLevel, (int) (heightMap.GetValue(r * std::sin(alpha), r * std::cos(alpha),layer) * mMountainHeight) + mGroundLevel);
+				int dirtHeight = (int) mSoilHeight;
+				for(int y = 0; y < groundLevel + dirtHeight + 1; y++){
+					if (y < groundLevel) {
+						map.idAt(x,y,layer) = Block::air;
+					} else if (y == groundLevel) {
+						map.idAt(x,y,layer) = mGrassBlock;
+					} else if (y <= groundLevel + dirtHeight){
+						map.idAt(x,y,layer) = mSoilBlock;
+					}
 				}
 			}
-		}*/
+		}
 	}
+
 
 	int Biome::chooseStoneBlock(double value) const{
 		int maxValue = 0;
@@ -121,7 +164,7 @@ namespace MapGenerator{
 			maxValue += pair.first;
 		}
 
-		int valueAsInt = (value + 1) / 2 * maxValue;
+		int valueAsInt = (value) * maxValue;
 
 		for (auto& pair : mStoneBlocks){
 			valueAsInt -= pair.first;
