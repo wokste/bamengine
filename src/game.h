@@ -10,7 +10,7 @@ public:
 	virtual ~IGame(){}
 
 	virtual void display(sf::RenderTarget&, float interpolation) = 0;
-	virtual void logic() = 0;
+	virtual void logic(bool hasFocus) = 0;
 
 	virtual void load(const std::string& mapname) = 0;
 	virtual void save(const std::string& mapname) = 0;

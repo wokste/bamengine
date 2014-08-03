@@ -16,6 +16,7 @@ class Game : public IGame{
 	sf::Vector2f mCenterPos{200.0f,200.0f};
 	const BlockList mBlockList;
 	std::unique_ptr<IMapRenderer> mMapRenderer;
+	std::shared_ptr<sf::Texture> mTexture;
 
 public:
 	Game() : mBlockList("data/blocks.csv"){
@@ -24,19 +25,24 @@ public:
 		mMapRenderer = IMapRenderer::factory();
 	}
 
+	~Game(){
+
+	}
+
 	void display(sf::RenderTarget& target, float interpolation) override{
 		sf::View v = target.getView();
 		v.setCenter(mCenterPos + interpolation * getCameraVelocity());
 		target.setView(v);
 
 		mSkybox->render(target);
-		// Render the map
 		mMapRenderer->render(*mMap, target);
 	}
 
-	void logic() override{
+	void logic(bool hasFocus) override{
 		mSkybox->tick();
-		mCenterPos += getCameraVelocity();
+		if (hasFocus){
+			mCenterPos += getCameraVelocity();
+		}
 	}
 
 private:

@@ -6,8 +6,28 @@
 #include "../game.h"
 
 namespace Gui{
-	ChatWindow::ChatWindow(sfg::Desktop& desktop, IGame& game) : mGame(game){
-		init(desktop);
+	ChatWindow::Ptr ChatWindow::Create(sfg::Desktop& desktop, IGame& game, std::uint8_t style){
+		ChatWindow::Ptr window( new ChatWindow( desktop, game, style ) );
+		window->init(desktop);
+		window->RequestResize();
+		return window;
+	}
+
+	ChatWindow::ChatWindow(sfg::Desktop& desktop, IGame& game, std::uint8_t style) : sfg::Window(style), mGame(game){
+		SetTitle( "Hello world!" );
+	}
+
+	void ChatWindow::init(sfg::Desktop& desktop){
+/*		SetRequisition(sf::Vector2f(50,50));
+		SetPosition(sf::Vector2f(50,50));
+
+		auto box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 1.0f);
+		Add(box);
+		mChatbox = sfg::Label::Create("Hello World");
+		mTextBox = sfg::Entry::Create("Hi there");
+
+		box->Pack(mChatbox);
+		box->Pack(mTextBox);*/
 	}
 
 	void ChatWindow::processLine(){
@@ -25,11 +45,6 @@ namespace Gui{
 			}
 			mTextBox->SetText("");
 		}
-	}
-
-	void ChatWindow::init(sfg::Desktop& desktop){
-		mWindow = sfg::Window::Create();
-		mWindow->SetTitle( "Hello world!" );
 	}
 
 	void ChatWindow::processCheat(const std::string& line){
@@ -50,9 +65,6 @@ namespace Gui{
 			stream >> biome >> seed;
 			mGame.generate(biome, seed);
 		}
-	}
-
-	void ChatWindow::resizeScreen(int screenWidth, int screenHeight){
 	}
 }
 
