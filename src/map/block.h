@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <cstdint>
 
 typedef uint16_t BlockId;
 
@@ -8,7 +9,7 @@ class Block{
 public:
 	std::string mTag = "";
 	int mFrame = 0;
-	
+
 	struct Flags{
 		int mDrawBack : 1;
 		int mFrameBorders : 1;

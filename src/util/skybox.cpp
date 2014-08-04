@@ -95,13 +95,12 @@ void Skybox::renderSun(sf::RenderTarget& window, const sf::IntRect& rect, int ti
 	float scale = 0.5f;
 	sprite.setScale(scale, scale);
 
-	constexpr double pi = 3.141592;
 
 	sf::Vector2u windowSize = window.getSize();
 
 	sf::Vector2i center(windowSize.x / 2, windowSize.y - 200);
 	sf::Vector2f radius(windowSize.x * 0.4, windowSize.x * 0.2);
-	double angle = pi * (time) + pi;
+	double angle = (MathPlus::PI * time) + MathPlus::PI;
 	sf::Vector2i translate(std::cos(angle) * radius.x, std::sin(angle) * radius.y);
 	sf::Vector2f worldPos = window.mapPixelToCoords(center + translate);
 
