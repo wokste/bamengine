@@ -28,10 +28,14 @@ namespace Gui{
 		mChatbox = sfg::Label::Create("Hello World");
 		mChatbox->SetRequisition(sf::Vector2f(mWidth,mHeight - mTextboxHeight));
 		mTextbox = sfg::Entry::Create("Hi there");
-		mTextbox->SetRequisition(sf::Vector2f(mWidth,mTextboxHeight));
+		mTextbox->SetRequisition(sf::Vector2f(mWidth - 100,mTextboxHeight));
+		auto button = sfg::Button::Create("ok");
+		button->SetRequisition(sf::Vector2f(100, mTextboxHeight));
+		button->GetSignal( sfg::Button::OnLeftClick ).Connect( std::bind( &ChatWindow::processLine, this ));
 
 		fixed->Put(mChatbox, sf::Vector2f( 0.f, 0.f ));
 		fixed->Put(mTextbox, sf::Vector2f( 0.f, mHeight - mTextboxHeight ));
+		fixed->Put(button, sf::Vector2f(mWidth - 100, mHeight - mTextboxHeight ));
 		Add(fixed);
 	}
 
@@ -42,10 +46,8 @@ namespace Gui{
 				processCheat(text);
 			} else {
 				std::string lines = mChatbox->GetText();
-
 				lines += "\n";
 				lines += text;
-
 				mChatbox->SetText(lines);
 			}
 			mTextbox->SetText("");
