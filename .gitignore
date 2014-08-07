@@ -1,5 +1,7 @@
 bin/*
 data/*
+Debug/
+zip/
 
 #backup files
 *.bak
@@ -38,7 +40,10 @@ data/*
 *.depend
 *.layout
 *.cbp
-
+*.sln
+*.suo
+*.sdf
+*.vcxproj*
 
 # Compression files
 *.zip
