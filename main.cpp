@@ -20,7 +20,7 @@ class Program{
 public:
 	Program() : app(sf::VideoMode(1000, 600), "BAM Engine"){
 		game = IGame::factory();
-		gui.init();
+		gui.init(*game);
 		resize(app, 1000, 600);
 	}
 

@@ -6,32 +6,37 @@
 #include "../game.h"
 
 namespace Gui{
-	ChatWindow::Ptr ChatWindow::Create(sfg::Desktop& desktop, IGame& game, std::uint8_t style){
-		ChatWindow::Ptr window( new ChatWindow( desktop, game, style ) );
-		window->init(desktop);
+	ChatWindow::Ptr ChatWindow::Create(IGame& game, std::uint8_t style){
+		ChatWindow::Ptr window( new ChatWindow( game, style ) );
+		window->init();
 		window->RequestResize();
 		return window;
 	}
 
-	ChatWindow::ChatWindow(sfg::Desktop& desktop, IGame& game, std::uint8_t style) : sfg::Window(style), mGame(game){
-		SetTitle( "Hello world!" );
+	ChatWindow::ChatWindow(IGame& game, std::uint8_t style) : DockingWindow(style), mGame(game){
+		SetTitle( "Console" );
 	}
 
-	void ChatWindow::init(sfg::Desktop& desktop){
-/*		SetRequisition(sf::Vector2f(50,50));
-		SetPosition(sf::Vector2f(50,50));
+	ChatWindow::~ChatWindow(){
+	}
 
-		auto box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 1.0f);
-		Add(box);
+	void ChatWindow::init(){
+		SetRequisition(sf::Vector2f(mWidth,mHeight));
+		dock(0, 1);
+
+		auto fixed = sfg::Fixed::Create();
 		mChatbox = sfg::Label::Create("Hello World");
-		mTextBox = sfg::Entry::Create("Hi there");
+		mChatbox->SetRequisition(sf::Vector2f(mWidth,mHeight - mTextboxHeight));
+		mTextbox = sfg::Entry::Create("Hi there");
+		mTextbox->SetRequisition(sf::Vector2f(mWidth,mTextboxHeight));
 
-		box->Pack(mChatbox);
-		box->Pack(mTextBox);*/
+		fixed->Put(mChatbox, sf::Vector2f( 0.f, 0.f ));
+		fixed->Put(mTextbox, sf::Vector2f( 0.f, mHeight - mTextboxHeight ));
+		Add(fixed);
 	}
 
 	void ChatWindow::processLine(){
-		std::string text = mTextBox->GetText();
+		std::string text = mTextbox->GetText();
 		if (text != ""){
 			if (text[0] == '/'){
 				processCheat(text);
@@ -43,7 +48,7 @@ namespace Gui{
 
 				mChatbox->SetText(lines);
 			}
-			mTextBox->SetText("");
+			mTextbox->SetText("");
 		}
 	}
 
