@@ -32,7 +32,7 @@ namespace MapGenerator{
 			mMountainWidth = 100;
 			mGroundLevel = 80;
 
-			std::string data("array(vein(0.003,gem1,10,0.1),vein(0.01,gem2,10,0.2),vein(0.015,gem3,10,0.5))");
+			std::string data("array(dungeon(0.002,stonebrick,40),dungeon(0.001,claybrick,40),dungeon(0.001,wood,40),vein(0.003,gem1,10,0.1),vein(0.01,gem2,10,0.2),vein(0.015,gem3,10,0.5))");
 			TokenStream stream(data);
 			mapStructures = makeStructureVector(stream, blockList);
 		}
