@@ -18,6 +18,8 @@ namespace Gui{
 	void DockingWindow::dock(float x, float y){
 		mDockX = x;
 		mDockY = y;
+		// TODO: This can cause some minor problems
+		onScreenResize(800, 600);
 	}
 
 	void DockingWindow::HandleEvent( const sf::Event& event ) {
@@ -25,8 +27,12 @@ namespace Gui{
 
 		if (event.type == sf::Event::Resized)
 		{
-			 auto size = GetRequisition();
-			 SetPosition(sf::Vector2f((event.size.width - size.x) * mDockX, (event.size.height - size.y) * mDockY));
+			 onScreenResize(event.size.width, event.size.height);
 		}
+	}
+
+	void DockingWindow::onScreenResize(int width, int height){
+		auto size = GetRequisition();
+		SetPosition(sf::Vector2f((width - size.x) * mDockX, (height - size.y) * mDockY));
 	}
 }

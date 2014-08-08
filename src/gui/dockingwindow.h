@@ -13,6 +13,7 @@ namespace Gui{
 		void dock(float x, float y);
 
 		void HandleEvent( const sf::Event& event ) override;
+		void onScreenResize(int width, int height);
 	};
 }
 
