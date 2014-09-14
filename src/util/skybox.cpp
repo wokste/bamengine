@@ -36,8 +36,8 @@ Skybox::Phase Skybox::getPhase() const{
 void Skybox::render(sf::RenderTarget& window) const{
 	renderSky(window);
 
-	renderSun(window, sf::IntRect(0,0,64,64), 0, mPhaseTime[Phase::Day] - mInterpolationTime);
-	renderSun(window, sf::IntRect(64,0,64,64), mPhaseTime[Phase::Day] - mInterpolationTime, mPhaseTime[Phase::Night]);
+	renderSun(window, sf::IntRect(0,0,64,64), 3.0f, 0, mPhaseTime[Phase::Day] - mInterpolationTime);
+	renderSun(window, sf::IntRect(64,0,64,64), 1.25f, mPhaseTime[Phase::Day] - mInterpolationTime, mPhaseTime[Phase::Night]);
 
 	int numLayers = 4;
 	for (int i = 1; i < numLayers + 1; i++)
@@ -81,7 +81,7 @@ void Skybox::renderTerrain(sf::RenderTarget& window, int imgTop, int imgHeight, 
 	window.draw(sprite);
 }
 
-void Skybox::renderSun(sf::RenderTarget& window, const sf::IntRect& rect, int tickStart, int tickEnd) const{
+void Skybox::renderSun(sf::RenderTarget& window, const sf::IntRect& rect, float scale, int tickStart, int tickEnd) const{
 	if (mTicks < tickStart || mTicks > tickEnd)
 		return;
 
@@ -92,7 +92,6 @@ void Skybox::renderSun(sf::RenderTarget& window, const sf::IntRect& rect, int ti
 	sprite.setTextureRect(rect);
 	sprite.setOrigin(32,32);
 	sprite.setRotation(mTicks * 0.1f);
-	float scale = 0.5f;
 	sprite.setScale(scale, scale);
 
 
