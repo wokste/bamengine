@@ -57,8 +57,8 @@ namespace MapGenerator{
 		biome.placeHeightMap(*map, rnd);
 
 		Dungeon dungeon;
-		dungeon.addRooms(*map, rnd, 4096);
-		dungeon.placeCorridors();
+		dungeon.addRooms(*map, rnd, 1024);
+		dungeon.prim();
 		dungeon.place(*map, rnd);
 
 		for (auto& mapStructure : biome.mapStructures){

@@ -3,15 +3,18 @@
 #include "../map/block.h"
 #include "../util/vectormath.h"
 #include <random>
+#include <iostream>
+
+using namespace std;
 
 namespace MapGenerator{
 	Room::Room(int backBlockId, int frontBlockId, sf::IntRect rect)
-		: mBackBlockId(backBlockId), mFrontBlockId(frontBlockId), mRect(rect)
+		: mBackBlockId(backBlockId), mFrontBlockId(frontBlockId), mRect(rect), mConnected(false), mDistance(999999), mParent(0)
 	{}
 
 	Room::~Room() = default;
 
-	void Room::place(Map& map, std::mt19937& rand){
+	void Room::place(Map& map, mt19937& rand){
 		int wall = 2;
 
 		for (int x = mRect.left; x < mRect.left + mRect.width; x++){
@@ -40,32 +43,34 @@ namespace MapGenerator{
 
 	Corridor::~Corridor() = default;
 
-	void Corridor::place(Dungeon& dungeon, Map& map, std::mt19937& rand){
-		Room& room1 = dungeon.mRooms[mRoomId1];
-		Room& room2 = dungeon.mRooms[mRoomId2];
+	void Corridor::place(Dungeon& dungeon, Map& map, mt19937& rand){
+		Room* room1 = &dungeon.mRooms[mRoomId1];
+		Room* room2 = &dungeon.mRooms[mRoomId2];
 
-		if (room1.getCenter().x > room2.getCenter().x){
-			std::swap(room1, room2);
+		if (room1->getCenter().x > room2->getCenter().x){
+			swap(room1, room2);
 		}
 
-		auto point1 = sf::Vector2i{room1.mRect.left + room1.mRect.width - 2, room1.mRect.top + room1.mRect.height - 2};
-		auto point2 = sf::Vector2i{room2.mRect.left + 2, room2.mRect.top + room2.mRect.height - 2};
+		auto point1 = sf::Vector2i{room1->mRect.left + room1->mRect.width - 2, room1->mRect.top + room1->mRect.height - 2};
+		auto point2 = sf::Vector2i{room2->mRect.left + 2, room2->mRect.top + room2->mRect.height - 2};
 
-		int yFloor = point1.y;
+		auto delta = point2 - point1;
+		float deltaerr = delta.x != 0 ? ((float)delta.y / (float)delta.x) : 1000;
+		float y = point1.y;
+
 		for (int x = point1.x; x < point2.x; x++){
-			if (yFloor < point2.y)
-				yFloor++;
-			else if (yFloor > point2.y)
-				yFloor--;
+
+			y += deltaerr ;
+			int yFloor = (int)(y);
 
 			int yCeil = yFloor - 4;
 			for (int y = yCeil - 2; y < yFloor + 2; y++){
 				if (map.blockPlayer(x, y, 1)){
-					map.setBlock(x, y, 0, room1.mBackBlockId);
+					map.setBlock(x, y, 0, room1->mBackBlockId);
 					if (y >= yCeil && y < yFloor)
 						map.setBlock(x, y, 1, Block::air);
 					else
-						map.setBlock(x, y, 1, room1.mFrontBlockId);
+						map.setBlock(x, y, 1, room1->mFrontBlockId);
 
 				}
 			}
@@ -75,20 +80,20 @@ namespace MapGenerator{
 	Dungeon::Dungeon() = default;
 	Dungeon::~Dungeon() = default;
 
-	int Dungeon::addRooms(const Map& map, std::mt19937& rand, int rooms){
+	int Dungeon::addRooms(const Map& map, mt19937& rand, int rooms){
 		int backBlockId = 4;
 		int frontBlockId = 6;
 		//TODO: Load this correctly
 
-		std::uniform_int_distribution<> roomWidthDist(12, 24);
-		std::uniform_int_distribution<> roomHeightDist(10, 18);
+		uniform_int_distribution<> roomWidthDist(12, 24);
+		uniform_int_distribution<> roomHeightDist(10, 18);
 
 		for (int i = 0; i < rooms; i++){
 			int roomWidth = roomWidthDist(rand);
 			int roomHeight = roomHeightDist(rand);
 
-			std::uniform_int_distribution<> roomXDist(0,map.getWidth() - roomWidth);
-			std::uniform_int_distribution<> roomYDist(0,map.getHeight() - roomHeight);
+			uniform_int_distribution<> roomXDist(0,map.getWidth() - roomWidth);
+			uniform_int_distribution<> roomYDist(0,map.getHeight() - roomHeight);
 
 			auto area = sf::IntRect(roomXDist(rand), roomYDist(rand), roomWidth, roomHeight);
 
@@ -113,7 +118,7 @@ namespace MapGenerator{
 		return true;
 	}
 
-	void Dungeon::place(Map& map, std::mt19937& rand){
+	void Dungeon::place(Map& map, mt19937& rand){
 		for( auto& room : mRooms){
 			room.place(map, rand);
 		}
@@ -122,108 +127,54 @@ namespace MapGenerator{
 		}
 	}
 
-	void Dungeon::placeCorridors(){
-		for(unsigned int i = 0; i < mRooms.size(); i++){
-			for(unsigned int j = i+1; j < mRooms.size(); j++){
-				if (VectorMath::length(mRooms[i].getCenter() - mRooms[j].getCenter()) < 40){
-					mCorridors.push_back(Corridor(i,j));
+	void Dungeon::prim(){
+		primConnect(0);
+
+		while(true){
+			float len = 99999;
+			int roomId;
+			for(unsigned int i = 0; i < mRooms.size(); i++){
+				if (mRooms[i].mConnected)
+					continue;
+
+				if (len > mRooms[i].mDistance){
+					roomId = i;
+					len = mRooms[i].mDistance;
 				}
 			}
+			if (len >= 99999)
+				return;
+
+			primConnect(roomId);
 		}
 
+		//TODO: implement Prims algorithm
+		//Source: Wikipedia
 		//Input: A non-empty connected weighted graph with vertices V and edges E (the weights can be negative).
 		//Initialize: Vnew = {x}, where x is an arbitrary node (starting point) from V, Enew = {}
 		//Repeat until Vnew = V:
 		//    Choose an edge {u, v} with minimal weight such that u is in Vnew and v is not (if there are multiple edges with the same weight, any of them may be picked)
 		//    Add v to Vnew, and {u, v} to Enew
 		//Output: Vnew and Enew describe a minimal spanning tree
-
 	}
 
-	/*class Dungeon {
-
-
-	public:
-		int mBackBlockId, mFrontBlockId;
-		int mRooms;
-
-		Dungeon() {
-			mBackBlockId = blockList.getId("sand");
-			mFrontBlockId = blockList.getId("sand");
-			mRooms = rooms;
+	void Dungeon::primConnect(int roomId){
+		if (roomId != mRooms[roomId].mParent){
+			mCorridors.push_back(Corridor(roomId, mRooms[roomId].mParent));
 		}
 
-		void addRooms(Map& map, mt19937& rand, int rooms){
-			int roomX = 14, roomY = 10;
+		mRooms[roomId].mConnected = true;
 
-			uniform_real_distribution<> horChange(30,40);
-			uniform_real_distribution<> vertChange(8,12);
-			int floorHeight = 6;
-			int floorDiff = 2;
-			int floorCount = 4;
+		for(auto& room : mRooms){
+			if (room.mConnected)
+				continue;
 
-			int curX = x, curY = y;
-
-			for(int i = 0; i < floorCount; i++){
-				curX = x;
-				for(int j = 0; j < 5; j++){
-
-
-					auto curRoom = sf::IntRect(curX, curY, roomX, roomY);
-					placeRoom(map, curRoom);
-					//if (i > 0)
-					//	placeCorridor(map, curRoom, lastRoom);
-
-					//lastRoom = curRoom;
-					curX -= 20;
-				}
-				curY += 20;
+			float newLen = VectorMath::length(room.getCenter() - mRooms[roomId].getCenter());
+			if (newLen < room.mDistance){
+				room.mDistance = newLen;
+				room.mParent = roomId;
 			}
 		}
-
-		void placeCorridor(Map& map, sf::Vector2i point1, sf::Vector2i point2){
-			if (point1.x > point2.x)
-				std::swap(point1, point2);
-
-			auto delta = point2 - point1;
-
-			int yFloor = point1.y;
-			for (int x = point1.x; x < point2.x; x++){
-				if (yFloor < point2.y)
-					yFloor++;
-				else if (yFloor > point2.y)
-					yFloor--;
-
-				int yCeil = yFloor - 4;
-				for (int y = yCeil - 2; y < yFloor + 2; y++){
-					if (map.blockPlayer(x, y, 1)){
-						map.setBlock(x, y, 0, mBackBlockId);
-						if (y >= yCeil && y < yFloor)
-							map.setBlock(x, y, 1, Block::air);
-						else
-							map.setBlock(x, y, 1, mFrontBlockId);
-
-					}
-				}
-			}
-		}
-
-		void placeRoom(Map& map, sf::IntRect rect){
-			int wall = 2;
-
-			for (int x = rect.left - wall; x < rect.left + rect.width + wall; x++){
-				for (int y = rect.top - wall; y < rect.top + rect.height + wall; y++){
-					if (map.blockPlayer(x, y, 1)){
-						map.setBlock(x, y, 0, mBackBlockId);
-						if (rect.contains(x,y))
-							map.setBlock(x, y, 1, Block::air);
-						else
-							map.setBlock(x, y, 1, mFrontBlockId);
-
-					}
-				}
-			}
-		}
-	};*/
+	}
 }
 
